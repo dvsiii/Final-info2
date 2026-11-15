@@ -33,6 +33,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         gancho.h gancho.cpp
         pista.h pista.cpp
         nivel.h nivel.cpp
+        notas.h notas.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Juego APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
