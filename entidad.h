@@ -3,6 +3,8 @@
 
 class entidad
 {
+    float posicion[2];
+    float hitbox;
 public:
     entidad();
 };
