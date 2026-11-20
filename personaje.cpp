@@ -46,5 +46,12 @@ void personaje::saltar(){
     }
 }
 void personaje::actualizar(){
-
+    setx(getposicionx()+velocidad[0]);
+    if(piso==true){
+        velocidad[1]=0;
+    }
+    sety(velocidad[1]+getposiciony());
+    if(piso==false){
+        velocidad[1]+=1;
+    }
 }
