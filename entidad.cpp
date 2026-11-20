@@ -75,5 +75,4 @@ bool entidad::colision(entidad* otra){
     return false;
 }
 entidad::~entidad(){
-
 }
