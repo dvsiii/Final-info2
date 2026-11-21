@@ -1,8 +1,9 @@
 #ifndef PUERTA_H
 #define PUERTA_H
-
-class puerta
+#include "obstaculo.h"
+class puerta: public obstaculo
 {
+
 public:
     puerta();
 };
