@@ -52,6 +52,6 @@ void personaje::actualizar(){
     }
     sety(velocidad[1]+getposiciony());
     if(piso==false){
-        velocidad[1]+=1;
+        velocidad[1]+=0.5f;
     }
 }
