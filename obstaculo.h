@@ -9,7 +9,6 @@ public:
     obstaculo();
     bool getactivo();
     void setactivo(bool a);
-    void actualizar() override;
 };
 
 #endif // OBSTACULO_H

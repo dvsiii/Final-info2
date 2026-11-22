@@ -9,8 +9,3 @@ bool obstaculo::getactivo(){
 void obstaculo::setactivo(bool a){
     activo=a;
 }
-void obstaculo::actualizar(){
-    if(activo==true){
-
-    }
-}
