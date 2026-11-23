@@ -1,7 +1,7 @@
 #ifndef WATSON_H
 #define WATSON_H
-
-class watson
+#include "personaje.h"
+class watson: public personaje
 {
 public:
     watson();
