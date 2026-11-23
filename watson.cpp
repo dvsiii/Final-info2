@@ -28,7 +28,7 @@ void watson::setpista(pista* p){
 }
 bala* watson::disparar(float x, float y){
     bala* eso=new bala;
-    float angulo=qCos(qAtan2(y-getposiciony(),x-getposicionx()));
+    float angulo=qAtan2(y-getposiciony(),x-getposicionx());
     eso->setx(getposicionx());
     eso->sety(getposiciony());
     eso->setv(15.0f*qCos(angulo),15.0f*qSin(angulo));
