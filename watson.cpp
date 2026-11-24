@@ -39,7 +39,6 @@ string watson::pistacerca(){
     string direccionx="";
     string direcciony="";
     if(pistas==nullptr){
-        pista* pistas;
         string mensaje="no hay pista disponible";
         return mensaje;
     }
