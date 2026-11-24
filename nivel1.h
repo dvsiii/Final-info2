@@ -19,6 +19,7 @@ class nivel1: public nivel
     std::vector<bala*> balas;
     sherlock jugador;
     watson agente;
+    short int objetivo=0;
 public:
     nivel1(short int dif);
     sherlock& getjugador();

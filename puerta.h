@@ -15,6 +15,7 @@ public:
     float getbl();
     float getba();
     float getd();
+    bool tocoboton(entidad* otra);
     void settiempo(float t);
     void setd(float du);
     void setpboton(float x, float y);
