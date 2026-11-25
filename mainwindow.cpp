@@ -1,12 +1,15 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <QPixmap>
+#include <QGraphicsPixmapItem>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     actual=nullptr;
+    spriteSherlock=nullptr;
+    spriteWatson=nullptr;
     estado=Inicio;
     opcion=0;
     inicio=new QGraphicsScene(this);
@@ -78,16 +81,60 @@ MainWindow::MainWindow(QWidget *parent)
         btnfacil->setVisible(true);
         btnnormal->setVisible(true);
         btndificil->setVisible(true);
+        actualizarbotones();
     });
 }
-void MainWindow::actualizarbotones(){}
-void MainWindow::iniciarnivel(short int dif){}
+void MainWindow::actualizarbotones(){
+    if(estado==Menu){
+        if(opcion==0){
+            btnjugar->setIcon(QIcon(":/assets/Boton jugar seleccionado.png"));
+            btnsalir->setIcon(QIcon(":/assets/Boton salir no seleccionado.png"));
+        }
+        else{
+            btnjugar->setIcon(QIcon(":/assets/Boton jugar no seleccionado.png"));
+            btnsalir->setIcon(QIcon(":/assets/Boton salir seleccionado.png"));
+        }
+    }
+    else if(estado==dificultad){
+        if(opcion==0){
+            btnfacil->setIcon(QIcon(":/assets/facils.png"));
+            btnnormal->setIcon(QIcon(":/assets/normalns.png"));
+            btndificil->setIcon(QIcon(":/assets/dificilns.png"));
+        }
+        else if(opcion==1){
+            btnfacil->setIcon(QIcon(":/assets/facilns.png"));
+            btnnormal->setIcon(QIcon(":/assets/normals.png"));
+            btndificil->setIcon(QIcon(":/assets/dificilns.png"));
+        }
+        else if(opcion==2){
+            btnfacil->setIcon(QIcon(":/assets/facilns.png"));
+            btnnormal->setIcon(QIcon(":/assets/normalns.png"));
+            btndificil->setIcon(QIcon(":/assets/dificils.png"));
+        }
+    }
+}
+void MainWindow::iniciarnivel(short int dif){
+    delete actual;
+    juego->clear();
+    QGraphicsPixmapItem *fondo=juego->addPixmap(QPixmap(":/assets/bocetomapa.png").scaled(2400,1800));
+    fondo->setPos(0,0);
+    juego->setSceneRect(0,0,2400,1800);
+    estado=jugando;
+    vista->setScene(juego);
+    vista->centerOn(1200,1718);
+    actual=new nivel1(dif);
+    spriteSherlock=juego->addPixmap(QPixmap(":/assets/Sherlock_walking.png").scaled(32,32));
+    spriteSherlock->setPos(1200,1718);
+    spriteWatson=juego->addRect(0,0,32,32);
+    spriteWatson->setPos(1150,1718);
+}
 void MainWindow::keyPressEvent(QKeyEvent *event){
     if(estado==Inicio){
         if(event->key()==Qt::Key_Return||event->key()==Qt::Key_Enter){
             estado=Menu;
             vista->setScene(menu);
             opcion=0;
+            actualizarbotones();
         }
     }
     else if(estado==Menu){
@@ -99,17 +146,21 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
         else if(event->key()==Qt::Key_Up){
             if(opcion==0){
                 opcion=1;
+                actualizarbotones();
             }
             else{
                 opcion=0;
+                actualizarbotones();
             }
         }
         else if(event->key()==Qt::Key_Down){
             if(opcion==0){
                 opcion=1;
+                actualizarbotones();
             }
             else{
                 opcion=0;
+                actualizarbotones();
             }
         }
         else if(event->key()==Qt::Key_Enter||event->key()==Qt::Key_Return){
@@ -119,6 +170,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
                 btnfacil->setVisible(true);
                 btnnormal->setVisible(true);
                 btndificil->setVisible(true);
+                actualizarbotones();
             }
             else{
                 close();
@@ -132,29 +184,74 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
             btnfacil->setVisible(false);
             btnnormal->setVisible(false);
             btndificil->setVisible(false);
+            actualizarbotones();
         }
         else if(event->key()==Qt::Key_Up){
             if(opcion==0){
                 opcion=2;
+                actualizarbotones();
             }
             else{
                 opcion--;
+                actualizarbotones();
             }
         }
         else if(event->key()==Qt::Key_Down){
             if(opcion==2){
                 opcion=0;
+                actualizarbotones();
             }
             else{
                 opcion++;
+                actualizarbotones();
             }
         }
         else if(event->key()==Qt::Key_Enter||event->key()==Qt::Key_Return){
             iniciarnivel(opcion);
         }
     }
+    else if(estado==jugando){
+        nivel1 *n1 = dynamic_cast<nivel1*>(actual);
+        if(n1!=nullptr){
+            sherlock& jugador=n1->getjugador();
+            bool correr=(event->modifiers()&Qt::ShiftModifier);
+            if(event->key()==Qt::Key_Left||event->key()==Qt::Key_A){
+                jugador.moverse(false,correr);
+            }
+            else if(event->key()==Qt::Key_Right||event->key()==Qt::Key_D){
+                jugador.moverse(true,correr);
+            }
+            else if(event->key()==Qt::Key_Up||event->key()==Qt::Key_W){
+                jugador.saltar();
+            }
+        }
+    }
 }
-void MainWindow::actualizarjuego(){}
+void MainWindow::keyReleaseEvent(QKeyEvent *event){
+    if(event->isAutoRepeat()) return;
+    if(estado==jugando){
+        nivel1*n1=dynamic_cast<nivel1*>(actual);
+        if (n1!=nullptr) {
+            sherlock& jugador=n1->getjugador();
+            if (event->key()==Qt::Key_Left||event->key()==Qt::Key_A||event->key()==Qt::Key_Right||event->key()==Qt::Key_D){
+                jugador.setv(0,jugador.getvy());
+            }
+        }
+    }
+}
+void MainWindow::actualizarjuego(){
+    if(estado==jugando&&actual!=nullptr){
+        actual->actualizar();
+        nivel1 *n1 = dynamic_cast<nivel1*>(actual);
+        if(n1!=nullptr){
+            sherlock* jugador=&n1->getjugador();
+            watson* agente=&n1->getagente();
+            spriteSherlock->setPos(jugador->getposicionx(),jugador->getposiciony());
+            spriteWatson->setPos(agente->getposicionx(),agente->getposiciony());
+            vista->centerOn(jugador->getposicionx(),jugador->getposiciony());
+        }
+    }
+}
 MainWindow::~MainWindow()
 {
     delete ui;

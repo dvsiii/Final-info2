@@ -6,16 +6,16 @@ nivel1::nivel1(short int dif) {
     jugador.setb(32);
     jugador.seta(32);
     jugador.setx(1200);
-    jugador.sety(568);
+    jugador.sety(1718);
     agente.seta(32);
     agente.setb(32);
     agente.setx(1150);
-    agente.sety(568);
+    agente.sety(1718);
     plataforma piso;
     piso.seta(50);
     piso.setb(2400);
     piso.setx(0);
-    piso.sety(600);
+    piso.sety(1750);
     plataformas.push_back(piso);
     if(dif==0){ //Modo facil
 
@@ -96,7 +96,7 @@ void nivel1::actualizar(){
             if(balas[i]->getposicionx()<0||balas[i]->getposicionx()>2400){
                 balas[i]->setacti(false);
             }
-            if(balas[i]->getposiciony()<-1300||balas[i]->getposiciony()>650){
+            if(balas[i]->getposiciony()<0||balas[i]->getposiciony()>1800){
                 balas[i]->setacti(false);
             }
             if(puert.tocoboton(balas[i])==true){

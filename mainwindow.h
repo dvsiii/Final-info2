@@ -8,6 +8,8 @@
 #include <QKeyEvent>
 #include <QPushButton>
 #include "nivel1.h"
+#include <QGraphicsPixmapItem>
+#include <QGraphicsRectItem>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -36,6 +38,8 @@ private:
     QPushButton *btnfacil;
     QPushButton *btnnormal;
     QPushButton *btndificil;
+    QGraphicsPixmapItem *spriteSherlock;
+    QGraphicsRectItem *spriteWatson;
     enum Estado{Inicio,Menu,dificultad,jugando,Pausa};
     Estado estado;
     short int opcion;
@@ -48,5 +52,6 @@ private slots:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 };
 #endif // MAINWINDOW_H
