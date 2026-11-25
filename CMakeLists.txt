@@ -37,6 +37,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         bala.h bala.cpp
         nivel1.h nivel1.cpp
         nivel2.h nivel2.cpp
+        recursos.qrc
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Juego APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

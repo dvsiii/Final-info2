@@ -72,9 +72,6 @@ bool puerta::tocoboton(entidad* otra){
             return true;
         }
     }
-    else if(boton[1]==0&&otra->gethitboxa()!=0){
-        return otra->colision(this);
-    }
     return false;
 }
 void puerta::activar(bool presionado){

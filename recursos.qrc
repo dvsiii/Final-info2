@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/bocetomapa.png</file>
+        <file>assets/inicio.png</file>
+        <file>assets/Menu.png</file>
+        <file>assets/Boton jugar seleccionado.png</file>
+        <file>assets/Boton salir no seleccionado.png</file>
+        <file>assets/Boton jugar no seleccionado.png</file>
+        <file>assets/Boton salir seleccionado.png</file>
+        <file>assets/dificilns.png</file>
+        <file>assets/dificils.png</file>
+        <file>assets/facilns.png</file>
+        <file>assets/facils.png</file>
+        <file>assets/normalns.png</file>
+        <file>assets/normals.png</file>
+    </qresource>
+</RCC>
