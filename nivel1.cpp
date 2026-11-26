@@ -1,5 +1,7 @@
 #include "nivel1.h"
 #include <QtMath>
+#include <algorithm>
+using namespace std;
 nivel1::nivel1(short int dif) {
     setdificultad(dif);
     objetivo=0;
@@ -11,17 +13,158 @@ nivel1::nivel1(short int dif) {
     agente.setb(32);
     agente.setx(1150);
     agente.sety(1718);
-    plataforma piso;
-    piso.seta(50);
-    piso.setb(2400);
-    piso.setx(0);
-    piso.sety(1750);
-    plataformas.push_back(piso);
+    piso[0].seta(50);
+    piso[0].setb(2400);
+    piso[0].setx(0);
+    piso[0].sety(1750);
+    piso[1].seta(1);
+    piso[1].setb(549);
+    piso[1].setx(4);
+    piso[1].sety(1119);
+    piso[2].seta(1);
+    piso[2].setb(473);
+    piso[2].setx(772);
+    piso[2].sety(1372);
+    piso[3].seta(1);
+    piso[3].setb(305);
+    piso[3].setx(1544);
+    piso[3].sety(1160);
+    piso[4].seta(1);
+    piso[4].setb(544);
+    piso[4].setx(1852);
+    piso[4].sety(140);
+    piso[5].seta(1800);
+    piso[5].setb(1);
+    piso[5].setx(0);
+    piso[5].sety(0);
+    piso[6].seta(1800);
+    piso[6].setb(1);
+    piso[6].setx(2400);
+    piso[6].sety(0);
+    pistas[0].setx(1300);
+    pistas[0].sety(1720);
+    pistas[0].setpistay(1720);
+    pistas[0].seta(24);
+    pistas[0].setb(24);
+    pistas[1].setx(2100);
+    pistas[1].sety(130);
+    pistas[1].setpistay(130);
+    pistas[1].seta(24);
+    pistas[1].setb(24);
+    pistas[2].setx(2369);
+    pistas[2].sety(1720);
+    pistas[2].setpistay(1720);
+    pistas[2].seta(24);
+    pistas[2].setb(24);
+    pistas[3].setx(12);
+    pistas[3].sety(1720);
+    pistas[3].setpistay(1720);
+    pistas[3].seta(24);
+    pistas[3].setb(24);
+    pistas[4].setx(192);
+    pistas[4].sety(1108);
+    pistas[4].setpistay(1108);
+    pistas[4].seta(24);
+    pistas[4].setb(24);
+    pistas[5].setx(932);
+    pistas[5].sety(1361);
+    pistas[5].setpistay(1361);
+    pistas[5].seta(24);
+    pistas[5].setb(24);
     if(dif==0){ //Modo facil
-
+        plataforma p;
+        p.setx(2000);
+        p.sety(1700);
+        p.seta(15);
+        p.setb(50);
+        p.setl2(2000,1731);
+        p.setl1(2000,140);
+        p.setv(0,10);
+        plataformas.push_back(p);
+        p.setx(300);
+        p.sety(1700);
+        p.seta(15);
+        p.setb(50);
+        p.setl2(300,1731);
+        p.setl1(300,1119);
+        plataformas.push_back(p);
     }
     else if(dif==1){ //Modo normal
-
+        plataforma p;
+        p.setx(1849);
+        p.sety(1700);
+        p.seta(15);
+        p.setb(50);
+        plataformas.push_back(p);
+        p.setx(2096);
+        p.sety(1550);
+        p.setl1(2096,1450);
+        p.setl2(2096,1590);
+        p.setv(0,3);
+        plataformas.push_back(p);
+        p.setx(1850);
+        p.sety(1340);
+        p.setl2(2250,1340);
+        p.setl1(1849,1340);
+        p.setv(3,0);
+        plataformas.push_back(p);
+        p.setx(2260);
+        p.sety(1323);
+        p.seta(10);
+        p.setb(40);
+        p.setv(0,0);
+        plataformas.push_back(p);
+        p.setx(2350);
+        p.sety(1190);
+        p.setl1(2350,900);
+        p.setl2(2350,1190);
+        p.setv(0,3);
+        plataformas.push_back(p);
+        p.setx(2350);
+        p.sety(880);
+        p.setl1(2000,530);
+        p.setl2(2350,880);
+        p.setv(3,3);
+        plataformas.push_back(p);
+        p.setx(1900);
+        p.sety(530);
+        p.seta(10);
+        p.setb(60);
+        p.setv(0,0);
+        plataformas.push_back(p);
+        p.setx(2050);
+        p.sety(500);
+        p.setl1(2050,300);
+        p.setl2(2050,500);
+        p.setv(0,3);
+        plataformas.push_back(p);
+        p.setx(2000);
+        p.sety(280);
+        p.setl1(2000,160);
+        p.setl2(2120,280);
+        p.setv(3,3);
+        plataformas.push_back(p);
+        p.setv(0,0);
+        p.setx(500);
+        p.sety(1600);
+        p.seta(20);
+        p.setb(60);
+        plataformas.push_back(p);
+        p.setx(350);
+        p.sety(1450);
+        plataformas.push_back(p);
+        p.setx(150);
+        p.sety(1350);
+        plataformas.push_back(p);
+        p.setx(200);
+        p.sety(1250);
+        plataformas.push_back(p);
+        puert.setb(50);
+        puert.seta(95);
+        puert.setx(1);
+        puert.sety(1637);
+        puert.setboton(12,16);
+        puert.setpboton(1232,1152);
     }
     else if(dif==2){ //Modo Dificil
     }
@@ -32,8 +175,52 @@ sherlock& nivel1::getjugador(){
 watson& nivel1::getagente(){
     return agente;
 }
+array<pista,6>& nivel1::getpistas(){
+    return pistas;
+}
+vector<plataforma>& nivel1::getplataformas(){
+    return plataformas;
+}
+vector<gancho>& nivel1::getganchos(){
+    return ganchos;
+}
+vector<bala*>& nivel1::getbalas(){
+    return balas;
+}
+puerta& nivel1::getpuerta(){
+    return puert;
+}
 void nivel1::agregarbala(bala* b){
     balas.push_back(b);
+}
+void nivel1::resolverColision(personaje& p, plataforma& bloque) {
+    float penIzq=(p.getposicionx()+p.gethitboxb())-bloque.getposicionx();
+    float penDer=(bloque.getposicionx()+bloque.gethitboxb())-p.getposicionx();
+    float penArriba=(p.getposiciony()+p.gethitboxa())-bloque.getposiciony();
+    float penAbajo=(bloque.getposiciony()+bloque.gethitboxa())-p.getposiciony();
+    if(std::min(penIzq, penDer)<std::min(penArriba, penAbajo)) {
+        if(penIzq<penDer){
+            p.setx(bloque.getposicionx()-p.gethitboxb());
+            p.setv(0,p.getvy());
+        }
+        else{
+            p.setx(bloque.getposicionx()+bloque.gethitboxb());
+            p.setv(0,p.getvy());
+        }
+    }
+    else{
+        if(penArriba<penAbajo&&p.getvy()>=0){
+            p.setx(p.getposicionx()+bloque.getvx());
+            if(bloque.getvy()>0){
+                p.setv(p.getvx(),bloque.getvy());
+            }
+            else{
+                p.setv(p.getvx(),0);
+            }
+            p.sety(bloque.getposiciony()-p.gethitboxa());
+            p.setp(true);
+        }
+    }
 }
 void nivel1::actualizar(){
     if(objetivo==6){
@@ -46,21 +233,21 @@ void nivel1::actualizar(){
     puert.actualizar();
     jugador.setp(false);
     agente.setp(false);
+    for(int i=6;i>=0;i--){
+        if(jugador.colision(&piso[i])==true){
+            resolverColision(jugador,piso[i]);
+        }
+        if(agente.colision(&piso[i])==true){
+            resolverColision(agente,piso[i]);
+        }
+    }
     for(int i=plataformas.size()-1;i>=0;i--){
         plataformas[i].actualizar();
-        if(jugador.colision(&plataformas[i])==true){
-            if(jugador.getvy()>=0){
-                jugador.setv(jugador.getvx(),0);
-                jugador.sety(plataformas[i].getposiciony()-jugador.gethitboxa());
-                jugador.setp(true);
-            }
+        if (jugador.colision(&plataformas[i]) == true) {
+            resolverColision(jugador,plataformas[i]);
         }
-        if(agente.colision(&plataformas[i])==true){
-            if(agente.getvy()>=0){
-                agente.setv(agente.getvx(),0);
-                agente.sety(plataformas[i].getposiciony()-agente.gethitboxa());
-                agente.setp(true);
-            }
+        if (agente.colision(&plataformas[i]) == true) {
+            resolverColision(agente,plataformas[i]);
         }
     }
     if(getdificultad()==2){
@@ -90,6 +277,11 @@ void nivel1::actualizar(){
             balas[i]->actualizar();
             for(int j=plataformas.size()-1;j>=0;j--){
                 if(balas[i]->colision(&plataformas[j])){
+                    balas[i]->setacti(false);
+                }
+            }
+            for(int j=4;j>=0;j--){
+                if(balas[i]->colision(&piso[j])){
                     balas[i]->setacti(false);
                 }
             }

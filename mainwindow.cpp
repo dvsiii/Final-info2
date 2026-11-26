@@ -7,9 +7,15 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    derecha=false;
+    izquierda=false;
+    correr=false;
     actual=nullptr;
     spriteSherlock=nullptr;
     spriteWatson=nullptr;
+    pistas.fill(nullptr);
+    spritepuerta=nullptr;
+    spriteboton=nullptr;
     estado=Inicio;
     opcion=0;
     inicio=new QGraphicsScene(this);
@@ -112,10 +118,22 @@ void MainWindow::actualizarbotones(){
             btndificil->setIcon(QIcon(":/assets/dificils.png"));
         }
     }
+    if(estado==jugando){
+        nivel1 *n1 = dynamic_cast<nivel1*>(actual);
+        if(n1!=nullptr){
+            if(n1->getpuerta().getactivo()==false){
+                spriteboton->setPixmap(QPixmap(":/assets/botonpurtap.png").scaled(n1->getpuerta().getbl(),n1->getpuerta().getba()));
+            }
+            else{
+                spriteboton->setPixmap(QPixmap(":/assets/botonpurtanp.png").scaled(n1->getpuerta().getbl(),n1->getpuerta().getba()));
+            }
+        }
+    }
 }
 void MainWindow::iniciarnivel(short int dif){
     delete actual;
     juego->clear();
+    plataform.clear();
     QGraphicsPixmapItem *fondo=juego->addPixmap(QPixmap(":/assets/bocetomapa.png").scaled(2400,1800));
     fondo->setPos(0,0);
     juego->setSceneRect(0,0,2400,1800);
@@ -127,6 +145,24 @@ void MainWindow::iniciarnivel(short int dif){
     spriteSherlock->setPos(1200,1718);
     spriteWatson=juego->addRect(0,0,32,32);
     spriteWatson->setPos(1150,1718);
+    nivel1 *n1 = dynamic_cast<nivel1*>(actual);
+    if(n1!=nullptr){
+        std::array<pista,6>& pistasas=n1->getpistas();
+        for(int i=5;i>=0;i--){
+            pistas[i]=juego->addPixmap(QPixmap(":/assets/pistas.png").scaled(24, 24));
+            pistas[i]->setPos(pistasas[i].getposicionx(),pistasas[i].getposiciony());
+        }
+        std::vector<plataforma>& plataformas=n1->getplataformas();
+        for(int i=0;i<plataformas.size();i++){
+            QGraphicsPixmapItem* sprite=juego->addPixmap(QPixmap(":/assets/plataforma.png").scaled(plataformas[i].gethitboxb(),plataformas[i].gethitboxa()));
+            sprite->setPos(plataformas[i].getposicionx(),plataformas[i].getposiciony());
+            plataform.push_back(sprite);
+        }
+        spritepuerta=juego->addPixmap(QPixmap(":/assets/puerta.png").scaled(n1->getpuerta().gethitboxb(),n1->getpuerta().gethitboxa()));
+        spritepuerta->setPos(n1->getpuerta().getposicionx(),n1->getpuerta().getposiciony());
+        spriteboton=juego->addPixmap(QPixmap(":/assets/botonpurtanp.png").scaled(n1->getpuerta().getbl(),n1->getpuerta().getba()));
+        spriteboton->setPos(n1->getpuerta().getpbx(),n1->getpuerta().getpby());
+    }
 }
 void MainWindow::keyPressEvent(QKeyEvent *event){
     if(estado==Inicio){
@@ -214,15 +250,17 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
         nivel1 *n1 = dynamic_cast<nivel1*>(actual);
         if(n1!=nullptr){
             sherlock& jugador=n1->getjugador();
-            bool correr=(event->modifiers()&Qt::ShiftModifier);
             if(event->key()==Qt::Key_Left||event->key()==Qt::Key_A){
-                jugador.moverse(false,correr);
+                izquierda=true;
             }
             else if(event->key()==Qt::Key_Right||event->key()==Qt::Key_D){
-                jugador.moverse(true,correr);
+                derecha=true;
             }
             else if(event->key()==Qt::Key_Up||event->key()==Qt::Key_W){
                 jugador.saltar();
+            }
+            else if(event->key()==Qt::Key_Shift){
+                correr=true;
             }
         }
     }
@@ -230,12 +268,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
 void MainWindow::keyReleaseEvent(QKeyEvent *event){
     if(event->isAutoRepeat()) return;
     if(estado==jugando){
-        nivel1*n1=dynamic_cast<nivel1*>(actual);
-        if (n1!=nullptr) {
-            sherlock& jugador=n1->getjugador();
-            if (event->key()==Qt::Key_Left||event->key()==Qt::Key_A||event->key()==Qt::Key_Right||event->key()==Qt::Key_D){
-                jugador.setv(0,jugador.getvy());
-            }
+        if(event->key()==Qt::Key_Left||event->key()==Qt::Key_A){
+            izquierda=false;
+        }
+        else if(event->key()==Qt::Key_Right||event->key()==Qt::Key_D){
+            derecha=false;
+        }
+        else if(event->key()==Qt::Key_Shift){
+            correr=false;
         }
     }
 }
@@ -246,9 +286,32 @@ void MainWindow::actualizarjuego(){
         if(n1!=nullptr){
             sherlock* jugador=&n1->getjugador();
             watson* agente=&n1->getagente();
+            std::array<pista,6>& pistasas=n1->getpistas();
             spriteSherlock->setPos(jugador->getposicionx(),jugador->getposiciony());
             spriteWatson->setPos(agente->getposicionx(),agente->getposiciony());
             vista->centerOn(jugador->getposicionx(),jugador->getposiciony());
+            for(int i=5;i>=0;i--){
+                if(pistasas[i].getrecolectado()==true){
+                    pistas[i]->setVisible(false);
+                }
+                pistas[i]->setPos(pistasas[i].getposicionx(),pistasas[i].getposiciony());
+            }
+            std::vector<plataforma>& plataformas=n1->getplataformas();
+            for(int i=plataformas.size()-1;i>=0;i--){
+                plataform[i]->setVisible(plataformas[i].getactivo());
+                plataform[i]->setPos(plataformas[i].getposicionx(),plataformas[i].getposiciony());
+            }
+            if(derecha==true){
+                jugador->moverse(true,correr);
+            }
+            else if(izquierda==true){
+                jugador->moverse(false,correr);
+            }
+            else{
+                jugador->setv(0,jugador->getvy());
+            }
+            spritepuerta->setVisible(n1->getpuerta().getactivo());
+            actualizarbotones();
         }
     }
 }

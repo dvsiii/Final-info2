@@ -16,5 +16,11 @@
         <file>assets/Sherlock_Cambiando_de_direccion_sprites.png</file>
         <file>assets/Sherlock_salta.png</file>
         <file>assets/Sherlock_walking.png</file>
+        <file>assets/botonpurtanp.png</file>
+        <file>assets/botonpurtap.png</file>
+        <file>assets/gancho.png</file>
+        <file>assets/plataforma.png</file>
+        <file>assets/puerta.png</file>
+        <file>assets/pistas.png</file>
     </qresource>
 </RCC>

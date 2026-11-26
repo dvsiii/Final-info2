@@ -32,26 +32,21 @@ void personaje::moverse(bool derecha, bool correr){
     }
     else{
         if(correr==true){
-            velocidad[0]=-10;
+            velocidad[0]=-8;
         }
         else{
-            velocidad[0]=-5;
+            velocidad[0]=-4;
         }
     }
 }
 void personaje::saltar(){
     if(piso==true){
-        velocidad[1]=-5;
+        velocidad[1]=-12.5;
         piso=false;
     }
 }
 void personaje::actualizar(){
     setx(getposicionx()+velocidad[0]);
-    if(piso==true){
-        velocidad[1]=0;
-    }
+    velocidad[1]+=0.5f;
     sety(velocidad[1]+getposiciony());
-    if(piso==false){
-        velocidad[1]+=0.5f;
-    }
 }

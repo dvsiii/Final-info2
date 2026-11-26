@@ -13,6 +13,7 @@
 class nivel1: public nivel
 {
     std::vector<plataforma> plataformas;
+    std::array<plataforma,7> piso;
     puerta puert;
     std::vector<gancho> ganchos;
     std::array<pista,6> pistas;
@@ -24,7 +25,13 @@ public:
     nivel1(short int dif);
     sherlock& getjugador();
     watson& getagente();
+    std::array<pista,6>& getpistas();
+    std::vector<gancho>& getganchos();
+    std::vector<plataforma>& getplataformas();
+    std::vector<bala*>& getbalas();
+    puerta& getpuerta();
     void agregarbala(bala* b);
+    void resolverColision(personaje& p,plataforma& bloque);
     void actualizar() override;
     ~nivel1();
 };

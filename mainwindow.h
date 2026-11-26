@@ -10,6 +10,7 @@
 #include "nivel1.h"
 #include <QGraphicsPixmapItem>
 #include <QGraphicsRectItem>
+#include <QLabel>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -40,6 +41,17 @@ private:
     QPushButton *btndificil;
     QGraphicsPixmapItem *spriteSherlock;
     QGraphicsRectItem *spriteWatson;
+    bool derecha;
+    bool izquierda;
+    bool correr;
+    bool interactuo;
+    QLabel *texotint;
+    std::array<QGraphicsPixmapItem*,6> pistas;
+    std::vector<QGraphicsPixmapItem*> plataform;
+    QGraphicsPixmapItem* spritepuerta;
+    QGraphicsPixmapItem* spriteboton;
+    std::vector<QGraphicsPixmapItem*> ganchos;
+    std::vector<QGraphicsPixmapItem*> balas;
     enum Estado{Inicio,Menu,dificultad,jugando,Pausa};
     Estado estado;
     short int opcion;

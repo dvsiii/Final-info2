@@ -68,6 +68,12 @@ void watson::actualizar(){
         else{
             setv(0,getvy());
         }
+        if(dsherlock[1]-getposiciony()>60){
+            sety(dsherlock[1]);
+        }
+        else if(dsherlock[1]-getposiciony()<-60){
+            sety(dsherlock[1]);
+        }
     }
     personaje::actualizar();
 }
