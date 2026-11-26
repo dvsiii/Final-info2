@@ -192,7 +192,7 @@ nivel1::nivel1(short int dif) {
         g.setx(1850);
         g.sety(1340);
         g.setb(20);
-        g.seta(4,4);
+        g.seta(40,40);
         g.setw(2);
         g.setac(2);
         ganchos.push_back(g);

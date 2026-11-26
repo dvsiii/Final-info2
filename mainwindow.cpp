@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     derecha=false;
     izquierda=false;
     correr=false;
+    lanzado=false;
     actual=nullptr;
     spriteSherlock=nullptr;
     spriteWatson=nullptr;
@@ -142,6 +143,7 @@ void MainWindow::iniciarnivel(short int dif){
     juego->clear();
     plataform.clear();
     bals.clear();
+    ganchos.clear();
     QGraphicsPixmapItem *fondo=juego->addPixmap(QPixmap(":/assets/bocetomapa.png").scaled(2400,1800));
     fondo->setPos(0,0);
     juego->setSceneRect(0,0,2400,1800);
@@ -172,8 +174,9 @@ void MainWindow::iniciarnivel(short int dif){
         spriteboton->setPos(n1->getpuerta().getpbx(),n1->getpuerta().getpby());
         std::vector<gancho>& ganchs=n1->getganchos();
         for(int i=0;i<ganchs.size();i++){
-            QGraphicsPixmapItem* sprite=juego->addPixmap(QPixmap(":/assets/gancho.png").scaled(ganchs[i].gethitboxb(),ganchs[i].gethitboxb()));
-            sprite->setPos(ganchs[i].getposicionx(),ganchs[i].getposiciony());
+            float r=ganchs[i].gethitboxb();
+            QGraphicsPixmapItem* sprite=juego->addPixmap(QPixmap(":/assets/gancho.png").scaled(2*ganchs[i].gethitboxb(),2*ganchs[i].gethitboxb()));
+            sprite->setPos(ganchs[i].getposicionx()-r,ganchs[i].getposiciony()-r);
             ganchos.push_back(sprite);
         }
     }
@@ -273,7 +276,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
                     derecha=true;
                 }
                 else if(event->key()==Qt::Key_Up||event->key()==Qt::Key_W){
-                    jugador.saltar();
+                    if(jugador.getgancho()==false){
+                        jugador.saltar();
+                        lanzado=false;
+                    }
+                    else{
+                        jugador.soltarse();
+                        lanzado=true;
+                    }
                 }
                 else if(event->key()==Qt::Key_Shift){
                     correr=true;
@@ -360,11 +370,15 @@ void MainWindow::actualizarjuego(){
             if(derecha==true){
                 jugador->moverse(true,correr);
             }
-            else if(izquierda==true){
+            else if(izquierda == true){
                 jugador->moverse(false,correr);
             }
-            else{
-                jugador->setv(0,jugador->getvy());
+            else if(jugador->getp()==true){
+                lanzado=false;
+                jugador->setv(0, jugador->getvy());
+            }
+            else if(lanzado==false){
+                jugador->setv(0, jugador->getvy());
             }
             spritepuerta->setVisible(n1->getpuerta().getactivo());
             actualizarbotones();
@@ -383,8 +397,9 @@ void MainWindow::actualizarjuego(){
             }
             std::vector<gancho>& ganchs=n1->getganchos();
             for(int i=ganchs.size()-1;i>=0;i--){
+                float r=ganchs[i].gethitboxb();
                 ganchos[i]->setVisible(ganchs[i].getactivo());
-                ganchos[i]->setPos(ganchs[i].getposicionx(),ganchs[i].getposiciony());
+                ganchos[i]->setPos(ganchs[i].getposicionx()-r,ganchs[i].getposiciony()-r);
             }
         }
     }

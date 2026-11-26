@@ -46,6 +46,7 @@ private:
     bool izquierda;
     bool correr;
     bool interactuo;
+    bool lanzado;
     QLabel *texotint;
     std::array<QGraphicsPixmapItem*,6> pistas;
     std::vector<QGraphicsPixmapItem*> plataform;
