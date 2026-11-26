@@ -4,6 +4,8 @@ bala::bala() {
     activo=false;
     velocidad[0]=0;
     velocidad[1]=0;
+    seta(8);
+    setb(8);
 }
 bool bala::getacti(){
     return activo;

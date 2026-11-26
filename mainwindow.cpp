@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
     vista->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     vista->setFocusPolicy(Qt::NoFocus);
     setCentralWidget(vista);
+    vista->viewport()->installEventFilter(this);
     tiempo=new QTimer(this);
     connect(tiempo,&QTimer::timeout,this,&MainWindow::actualizarjuego);
     tiempo->start(16);
@@ -89,6 +90,12 @@ MainWindow::MainWindow(QWidget *parent)
         btndificil->setVisible(true);
         actualizarbotones();
     });
+    interactuo=false;
+    texotint=new QLabel(this);
+    texotint->setGeometry(180,20,440,40);
+    texotint->setAlignment(Qt::AlignCenter);
+    texotint->setStyleSheet("background-color: rgba(0, 0, 0, 180); color: white; font-size: 14px;");
+    texotint->setVisible(false);
 }
 void MainWindow::actualizarbotones(){
     if(estado==Menu){
@@ -134,6 +141,7 @@ void MainWindow::iniciarnivel(short int dif){
     delete actual;
     juego->clear();
     plataform.clear();
+    bals.clear();
     QGraphicsPixmapItem *fondo=juego->addPixmap(QPixmap(":/assets/bocetomapa.png").scaled(2400,1800));
     fondo->setPos(0,0);
     juego->setSceneRect(0,0,2400,1800);
@@ -162,6 +170,12 @@ void MainWindow::iniciarnivel(short int dif){
         spritepuerta->setPos(n1->getpuerta().getposicionx(),n1->getpuerta().getposiciony());
         spriteboton=juego->addPixmap(QPixmap(":/assets/botonpurtanp.png").scaled(n1->getpuerta().getbl(),n1->getpuerta().getba()));
         spriteboton->setPos(n1->getpuerta().getpbx(),n1->getpuerta().getpby());
+        std::vector<gancho>& ganchs=n1->getganchos();
+        for(int i=0;i<ganchs.size();i++){
+            QGraphicsPixmapItem* sprite=juego->addPixmap(QPixmap(":/assets/gancho.png").scaled(ganchs[i].gethitboxb(),ganchs[i].gethitboxb()));
+            sprite->setPos(ganchs[i].getposicionx(),ganchs[i].getposiciony());
+            ganchos.push_back(sprite);
+        }
     }
 }
 void MainWindow::keyPressEvent(QKeyEvent *event){
@@ -250,17 +264,40 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
         nivel1 *n1 = dynamic_cast<nivel1*>(actual);
         if(n1!=nullptr){
             sherlock& jugador=n1->getjugador();
-            if(event->key()==Qt::Key_Left||event->key()==Qt::Key_A){
-                izquierda=true;
+            watson& agente=n1->getagente();
+            if(interactuo==false&&agente.getcontrol()==false){
+                if(event->key()==Qt::Key_Left||event->key()==Qt::Key_A){
+                    izquierda=true;
+                }
+                else if(event->key()==Qt::Key_Right||event->key()==Qt::Key_D){
+                    derecha=true;
+                }
+                else if(event->key()==Qt::Key_Up||event->key()==Qt::Key_W){
+                    jugador.saltar();
+                }
+                else if(event->key()==Qt::Key_Shift){
+                    correr=true;
+                }
+                else if(event->key()==Qt::Key_E){
+                    interactuo=true;
+                    izquierda=false;
+                    derecha=false;
+                    correr=false;
+                    texotint->setText("1: Pista | 2: Disparar");
+                    texotint->setVisible(true);
+                }
             }
-            else if(event->key()==Qt::Key_Right||event->key()==Qt::Key_D){
-                derecha=true;
-            }
-            else if(event->key()==Qt::Key_Up||event->key()==Qt::Key_W){
-                jugador.saltar();
-            }
-            else if(event->key()==Qt::Key_Shift){
-                correr=true;
+            else if(interactuo==true){
+                if(event->key()==Qt::Key_1){
+                    texotint->setText(QString::fromStdString(agente.pistacerca()));
+                    interactuo=false;
+                }
+                else if(event->key()==Qt::Key_2){
+                    agente.setcontrol(true);
+                    agente.setv(0,agente.getvy());
+                    texotint->setText("Haz clic para disparar");
+                    interactuo = false;
+                }
             }
         }
     }
@@ -278,6 +315,25 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event){
             correr=false;
         }
     }
+}
+bool MainWindow::eventFilter(QObject *obj,QEvent *event){
+    if(obj==vista->viewport()&&event->type()==QEvent::MouseButtonPress){
+        if(estado==jugando&&actual!=nullptr){
+            nivel1 *n1=dynamic_cast<nivel1*>(actual);
+            if(n1!=nullptr&&n1->getagente().getcontrol()==true){
+                QMouseEvent *mouseEvent=static_cast<QMouseEvent*>(event);
+                QPointF posMapa=vista->mapToScene(mouseEvent->pos());
+                bala* nueva=n1->getagente().disparar(posMapa.x(),posMapa.y());
+                n1->agregarbala(nueva);
+                QGraphicsPixmapItem* sprite = juego->addPixmap(QPixmap(":/assets/bala.png").scaled(8,8));
+                sprite->setPos(nueva->getposicionx(),nueva->getposiciony());
+                bals.push_back(sprite);
+                n1->getagente().setcontrol(false);
+                texotint->setVisible(false);
+            }
+        }
+    }
+    return QMainWindow::eventFilter(obj, event);
 }
 void MainWindow::actualizarjuego(){
     if(estado==jugando&&actual!=nullptr){
@@ -312,6 +368,24 @@ void MainWindow::actualizarjuego(){
             }
             spritepuerta->setVisible(n1->getpuerta().getactivo());
             actualizarbotones();
+            std::vector<bala*>& balas=n1->getbalas();
+            for(int i=bals.size()-1;i>=0;i--){
+                if(balas[i]->getacti()==true){
+                    bals[i]->setPos(balas[i]->getposicionx(),balas[i]->getposiciony());
+                }
+                else{
+                    delete balas[i];
+                    balas.erase(balas.begin()+i);
+                    juego->removeItem(bals[i]);
+                    delete bals[i];
+                    bals.erase(bals.begin()+i);
+                }
+            }
+            std::vector<gancho>& ganchs=n1->getganchos();
+            for(int i=ganchs.size()-1;i>=0;i--){
+                ganchos[i]->setVisible(ganchs[i].getactivo());
+                ganchos[i]->setPos(ganchs[i].getposicionx(),ganchs[i].getposiciony());
+            }
         }
     }
 }

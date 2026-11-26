@@ -11,6 +11,7 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsRectItem>
 #include <QLabel>
+#include <QMouseEvent>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -51,7 +52,7 @@ private:
     QGraphicsPixmapItem* spritepuerta;
     QGraphicsPixmapItem* spriteboton;
     std::vector<QGraphicsPixmapItem*> ganchos;
-    std::vector<QGraphicsPixmapItem*> balas;
+    std::vector<QGraphicsPixmapItem*> bals;
     enum Estado{Inicio,Menu,dificultad,jugando,Pausa};
     Estado estado;
     short int opcion;
@@ -65,5 +66,6 @@ private slots:
 protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
 };
 #endif // MAINWINDOW_H

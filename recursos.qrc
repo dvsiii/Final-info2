@@ -22,5 +22,6 @@
         <file>assets/plataforma.png</file>
         <file>assets/puerta.png</file>
         <file>assets/pistas.png</file>
+        <file>assets/bala.png</file>
     </qresource>
 </RCC>

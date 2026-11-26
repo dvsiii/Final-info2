@@ -165,8 +165,37 @@ nivel1::nivel1(short int dif) {
         puert.sety(1637);
         puert.setboton(12,16);
         puert.setpboton(1232,1152);
+        puert.setd(30);
     }
     else if(dif==2){ //Modo Dificil
+        puert.setb(50);
+        puert.seta(95);
+        puert.setx(1);
+        puert.sety(1637);
+        puert.setboton(12,16);
+        puert.setpboton(1232,1152);
+        puert.setd(30);
+        plataforma p;
+        gancho g;
+        p.setx(1849);
+        p.sety(1700);
+        p.seta(15);
+        p.setb(50);
+        plataformas.push_back(p);
+        p.setx(2096);
+        p.sety(1550);
+        p.setl1(2096,1450);
+        p.setl2(2096,1590);
+        p.setv(0,3);
+        plataformas.push_back(p);
+        g.sete(1850,1340);
+        g.setx(1850);
+        g.sety(1340);
+        g.setb(20);
+        g.seta(4,4);
+        g.setw(2);
+        g.setac(2);
+        ganchos.push_back(g);
     }
 }
 sherlock& nivel1::getjugador(){
