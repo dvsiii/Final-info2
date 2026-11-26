@@ -41,7 +41,7 @@ void gancho::setac(float t){
     acumulado=t;
 }
 void gancho::actualizar(){
-    setx(equilibrio[0]+amplitud[0]*qSin(w*acumulado));
+    setx(equilibrio[0]+amplitud[0]*qCos(w*acumulado));
     sety(equilibrio[1]+amplitud[1]*qSin(w*acumulado));
     acumulado+=0.016f;
 }

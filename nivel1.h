@@ -21,6 +21,7 @@ class nivel1: public nivel
     sherlock jugador;
     watson agente;
     short int objetivo=0;
+    int ganchoActual=-1;
 public:
     nivel1(short int dif);
     sherlock& getjugador();

@@ -7,6 +7,7 @@ class sherlock: public personaje
     float pivote[2];
     float fangular;
     float angulo;
+    float espera;
 public:
     sherlock();
     bool getgancho();
@@ -14,6 +15,7 @@ public:
     float getpivotey();
     float getfa();
     float getangulo();
+    float getespera();
     void setfa(float fa);
     void setangulo(float a);
     void setpivote(float x, float y);

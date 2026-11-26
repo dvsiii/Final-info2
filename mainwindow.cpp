@@ -368,10 +368,20 @@ void MainWindow::actualizarjuego(){
                 plataform[i]->setPos(plataformas[i].getposicionx(),plataformas[i].getposiciony());
             }
             if(derecha==true){
-                jugador->moverse(true,correr);
+                if(jugador->getgancho()==false){
+                    jugador->moverse(true,correr);
+                }
+                else{
+                    jugador->setfa(jugador->getfa()+0.35f);
+                }
             }
-            else if(izquierda == true){
-                jugador->moverse(false,correr);
+            else if(izquierda==true){
+                if(jugador->getgancho()==false){
+                    jugador->moverse(false,correr);
+                }
+                else{
+                    jugador->setfa(jugador->getfa()-0.35f);
+                }
             }
             else if(jugador->getp()==true){
                 lanzado=false;

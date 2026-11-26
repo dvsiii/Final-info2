@@ -188,14 +188,73 @@ nivel1::nivel1(short int dif) {
         p.setl2(2096,1590);
         p.setv(0,3);
         plataformas.push_back(p);
-        g.sete(1850,1340);
-        g.setx(1850);
+        g.sete(1950,1340);
+        g.setx(1950);
         g.sety(1340);
         g.setb(20);
-        g.seta(40,40);
-        g.setw(2);
-        g.setac(2);
+        g.seta(0,0);
+        g.setw(0);
+        g.setac(0);
         ganchos.push_back(g);
+        p.setx(2350);
+        p.sety(1200);
+        p.setv(0,0);
+        p.setb(50);
+        p.seta(20);
+        plataformas.push_back(p);
+        g.sete(2000,1050);
+        g.setx(2000);
+        g.sety(1050);
+        g.setb(20);
+        g.seta(40,20);
+        g.setw(2);
+        g.setac(3);
+        ganchos.push_back(g);
+        g.sete(2310,840);
+        g.setx(2310);
+        g.sety(840);
+        g.setb(25);
+        g.seta(0,0);
+        g.setw(0);
+        g.setac(0);
+        ganchos.push_back(g);
+        p.setx(1900);
+        p.sety(700);
+        plataformas.push_back(p);
+        p.setx(2100);
+        p.sety(600);
+        p.setl1(2100,400);
+        p.setl2(2300,600);
+        p.setv(3,3);
+        plataformas.push_back(p);
+        p.setx(2000);
+        p.sety(350);
+        p.setv(0,3);
+        p.setl1(2000,250);
+        p.setl2(2000,350);
+        plataformas.push_back(p);
+        p.setv(0,0);
+        p.setx(500);
+        p.sety(1600);
+        p.seta(20);
+        p.setb(60);
+        plataformas.push_back(p);
+        p.setx(350);
+        p.sety(1450);
+        plataformas.push_back(p);
+        p.setx(150);
+        p.sety(1350);
+        plataformas.push_back(p);
+        p.setx(200);
+        p.sety(1250);
+        plataformas.push_back(p);
+        puert.setb(50);
+        puert.seta(95);
+        puert.setx(1);
+        puert.sety(1637);
+        puert.setboton(12,16);
+        puert.setpboton(1232,1152);
+        puert.setd(30);
     }
 }
 sherlock& nivel1::getjugador(){
@@ -282,9 +341,16 @@ void nivel1::actualizar(){
     if(getdificultad()==2){
         for(int i=ganchos.size()-1;i>=0;i--){
             ganchos[i].actualizar();
-            if(jugador.colision(&ganchos[i])==true&&jugador.getgancho()==false){
-                jugador.agarre(ganchos[i].getex(),ganchos[i].getey());
+            if(jugador.colision(&ganchos[i])==true&&jugador.getgancho()==false&&jugador.getespera()<0){
+                jugador.agarre(ganchos[i].getposicionx(),ganchos[i].getposiciony());
+                ganchoActual=i;
             }
+        }
+        if(jugador.getgancho()==true&&ganchoActual!=-1){
+            jugador.setpivote(ganchos[ganchoActual].getposicionx(),ganchos[ganchoActual].getposiciony());
+        }
+        else{
+            ganchoActual=-1;
         }
     }
     pista* cercana =nullptr;
