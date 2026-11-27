@@ -12,6 +12,8 @@
 #include <QGraphicsRectItem>
 #include <QLabel>
 #include <QMouseEvent>
+#include <QGraphicsLineItem>
+#include <QGraphicsEllipseItem>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -32,7 +34,10 @@ private:
     QGraphicsScene *inicio;
     QGraphicsScene *menu;
     QGraphicsScene *juego;
-    QWidget *pausa;
+    QGraphicsScene *perdiste;
+    QLabel *labelpistas;
+    QLabel *labeltiempo;
+    QTimer *reloj;
     QTimer *tiempo;
     nivel *actual;
     QPushButton *btnjugar;
@@ -41,7 +46,18 @@ private:
     QPushButton *btnnormal;
     QPushButton *btndificil;
     QGraphicsPixmapItem *spriteSherlock;
-    QGraphicsRectItem *spriteWatson;
+    QGraphicsPixmapItem *spriteWatson;
+    std::array<QGraphicsEllipseItem*,15> mira;
+    QPixmap hojaSherlock;
+    QPixmap saltosherlock;
+    QPixmap hojaWatson;
+    bool mirandoderecha;
+    int segundosRestantes;
+    int frameactual;
+    int contadoranim;
+    bool mirandoderechaw;
+    int frameactualw;
+    int contadoranimw;
     bool derecha;
     bool izquierda;
     bool correr;
@@ -54,14 +70,16 @@ private:
     QGraphicsPixmapItem* spriteboton;
     std::vector<QGraphicsPixmapItem*> ganchos;
     std::vector<QGraphicsPixmapItem*> bals;
-    enum Estado{Inicio,Menu,dificultad,jugando,Pausa};
+    enum Estado{Inicio,Menu,dificultad,jugando,Perdiste};
     Estado estado;
+    QGraphicsLineItem *cuerda;
     short int opcion;
 
 
 private slots:
     void actualizarjuego();
     void actualizarbotones();
+    void actualizartiempo();
     void iniciarnivel(short int dif);
 
 protected:

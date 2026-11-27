@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include <QPixmap>
 #include <QGraphicsPixmapItem>
+#include <QtMath>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -12,16 +13,26 @@ MainWindow::MainWindow(QWidget *parent)
     correr=false;
     lanzado=false;
     actual=nullptr;
+    mirandoderecha=false;
+    frameactual=0;
+    contadoranim=0;
+    mirandoderechaw=false;
+    frameactualw=0;
+    contadoranimw=0;
     spriteSherlock=nullptr;
     spriteWatson=nullptr;
     pistas.fill(nullptr);
+    mira.fill(nullptr);
     spritepuerta=nullptr;
     spriteboton=nullptr;
+    cuerda=nullptr;
     estado=Inicio;
     opcion=0;
     inicio=new QGraphicsScene(this);
     menu=new QGraphicsScene(this);
     juego=new QGraphicsScene(this);
+    perdiste=new QGraphicsScene(this);
+    reloj=new QTimer(this);
     btnjugar=new QPushButton;
     btnsalir=new QPushButton;
     btnfacil=new QPushButton;
@@ -57,12 +68,14 @@ MainWindow::MainWindow(QWidget *parent)
     btndificil->setFocusPolicy(Qt::NoFocus);
     inicio->setSceneRect(0,0,800,600);
     menu->setSceneRect(0,0,800,600);
+    perdiste->setSceneRect(0,0,800,600);
     vista=new QGraphicsView(inicio,this);
     vista->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     vista->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     vista->setFocusPolicy(Qt::NoFocus);
     setCentralWidget(vista);
     vista->viewport()->installEventFilter(this);
+    vista->viewport()->setMouseTracking(true);
     tiempo=new QTimer(this);
     connect(tiempo,&QTimer::timeout,this,&MainWindow::actualizarjuego);
     tiempo->start(16);
@@ -91,12 +104,27 @@ MainWindow::MainWindow(QWidget *parent)
         btndificil->setVisible(true);
         actualizarbotones();
     });
+    connect(reloj, &QTimer::timeout, this, &MainWindow::actualizartiempo);
     interactuo=false;
     texotint=new QLabel(this);
     texotint->setGeometry(180,20,440,40);
     texotint->setAlignment(Qt::AlignCenter);
     texotint->setStyleSheet("background-color: rgba(0, 0, 0, 180); color: white; font-size: 14px;");
     texotint->setVisible(false);
+    labelpistas=new QLabel(this);
+    labeltiempo=new QLabel(this);
+    labelpistas->setGeometry(20,20,140,40);
+    labelpistas->setAlignment(Qt::AlignCenter);
+    labelpistas->setStyleSheet("background-color: rgba(0, 0, 0, 180); color: white; font-size: 14px;");
+    labelpistas->setVisible(false);
+    labeltiempo->setGeometry(640,20,140,40);
+    labeltiempo->setAlignment(Qt::AlignCenter);
+    labeltiempo->setStyleSheet("background-color: rgba(0, 0, 0, 180); color: white; font-size: 14px;");
+    labeltiempo->setVisible(false);
+    hojaSherlock.load(":/assets/Sherlock_walking.png");
+    saltosherlock.load(":/assets/Sherlock_salta.png");
+    hojaWatson.load(":/assets/watson.png");
+    vista->scale(1.8,1.8);
 }
 void MainWindow::actualizarbotones(){
     if(estado==Menu){
@@ -145,15 +173,28 @@ void MainWindow::iniciarnivel(short int dif){
     bals.clear();
     ganchos.clear();
     QGraphicsPixmapItem *fondo=juego->addPixmap(QPixmap(":/assets/bocetomapa.png").scaled(2400,1800));
+    for(int i=0;i<15;i++){
+        mira[i]=juego->addEllipse(0,0,4,4,QPen(Qt::NoPen),QBrush(Qt::white));
+        mira[i]->setVisible(false);
+        mira[i]->setZValue(10);
+    }
+    cuerda=juego->addLine(0,0,0,0,QPen(Qt::black,2));
+    cuerda->setVisible(false);
     fondo->setPos(0,0);
     juego->setSceneRect(0,0,2400,1800);
     estado=jugando;
     vista->setScene(juego);
     vista->centerOn(1200,1718);
     actual=new nivel1(dif);
-    spriteSherlock=juego->addPixmap(QPixmap(":/assets/Sherlock_walking.png").scaled(32,32));
+    segundosRestantes=180;
+    reloj->start(1000);
+    int ancho=hojaSherlock.width()/3;
+    int alto=hojaSherlock.height()/2;
+    int anchow=hojaWatson.width()/3;
+    int altow=hojaWatson.height();
+    spriteSherlock = juego->addPixmap(hojaSherlock.copy(0,0,ancho,alto).scaled(32,32));
     spriteSherlock->setPos(1200,1718);
-    spriteWatson=juego->addRect(0,0,32,32);
+    spriteWatson=juego->addPixmap(hojaWatson.copy(0,0,anchow,altow).scaled(32,32));
     spriteWatson->setPos(1150,1718);
     nivel1 *n1 = dynamic_cast<nivel1*>(actual);
     if(n1!=nullptr){
@@ -340,10 +381,49 @@ bool MainWindow::eventFilter(QObject *obj,QEvent *event){
                 bals.push_back(sprite);
                 n1->getagente().setcontrol(false);
                 texotint->setVisible(false);
+                for(int i=0;i<15;i++){
+                    mira[i]->setVisible(false);
+                }
+            }
+        }
+    }
+    else if(obj==vista->viewport()&&event->type()==QEvent::MouseMove){
+        if(estado==jugando&&actual!=nullptr){
+            nivel1 *n1=dynamic_cast<nivel1*>(actual);
+            if (n1!=nullptr&& n1->getagente().getcontrol()==true){
+                QMouseEvent *mouseEvent=static_cast<QMouseEvent*>(event);
+                QPointF posMapa=vista->mapToScene(mouseEvent->pos());
+                float px=n1->getagente().getposicionx();
+                float py=n1->getagente().getposiciony();
+                float angulo=qAtan2(posMapa.y()-py,posMapa.x()-px);
+                float vx=15.0f*qCos(angulo);
+                float vy=15.0f*qSin(angulo);
+                for (int i=0;i<15;i++) {
+                    px+=vx;
+                    py+=vy;
+                    vy+=0.5f;
+                    mira[i]->setPos(px,py);
+                    mira[i]->setVisible(true);
+                }
             }
         }
     }
     return QMainWindow::eventFilter(obj, event);
+}
+void MainWindow::actualizartiempo(){
+    segundosRestantes--;
+    int min=segundosRestantes/60;
+    int seg=segundosRestantes%60;
+    labeltiempo->setText(QString("%1:%2").arg(min,2,10,QChar('0')).arg(seg,2,10,QChar('0')));
+    if(segundosRestantes<=0){
+        reloj->stop();
+        estado=Perdiste;
+        derecha=izquierda=correr=interactuo=false;
+        labelpistas->setVisible(false);
+        labeltiempo->setVisible(false);
+        texotint->setVisible(false);
+        vista->setScene(perdiste);
+    }
 }
 void MainWindow::actualizarjuego(){
     if(estado==jugando&&actual!=nullptr){
@@ -367,6 +447,13 @@ void MainWindow::actualizarjuego(){
                 plataform[i]->setVisible(plataformas[i].getactivo());
                 plataform[i]->setPos(plataformas[i].getposicionx(),plataformas[i].getposiciony());
             }
+            if(jugador->getgancho()==true){
+                cuerda->setVisible(true);
+                cuerda->setLine(jugador->getposicionx()+16, jugador->getposiciony()+16,jugador->getpivotex(),jugador->getpivotey());
+            }
+            else{
+                cuerda->setVisible(false);
+            }
             if(derecha==true){
                 if(jugador->getgancho()==false){
                     jugador->moverse(true,correr);
@@ -385,11 +472,68 @@ void MainWindow::actualizarjuego(){
             }
             else if(jugador->getp()==true){
                 lanzado=false;
-                jugador->setv(0, jugador->getvy());
+                jugador->setv(0,jugador->getvy());
             }
             else if(lanzado==false){
-                jugador->setv(0, jugador->getvy());
+                jugador->setv(0,jugador->getvy());
             }
+            int ancho=hojaSherlock.width()/3;
+            int alto=hojaSherlock.height()/2;
+            if(derecha==true){
+                mirandoderecha=true;
+            }
+            else if(izquierda==true){
+                mirandoderecha=false;
+            }
+            if(jugador->getp()==false&&jugador->getgancho()==false){
+                int anchos=saltosherlock.width()/3;
+                int altos=saltosherlock.height();
+                int col=(jugador->getvy()<0)?2:1;
+                QPixmap frame=saltosherlock.copy(col*anchos,0,anchos,altos).scaled(32,32);
+                if(mirandoderecha==false){
+                    frame=frame.transformed(QTransform().scale(-1, 1));
+                }
+                spriteSherlock->setPixmap(frame);
+            }
+            else{
+                if((derecha==true||izquierda==true)&&jugador->getp()==true){
+                    contadoranim++;
+                    if (contadoranim>=6){
+                        contadoranim=0;
+                        frameactual=(frameactual+1)%3;
+                    }
+                }
+                else{
+                    contadoranim=0;
+                    frameactual=mirandoderecha?0:2;
+                }
+                int fila=mirandoderecha?1:0;
+                spriteSherlock->setPixmap(hojaSherlock.copy(frameactual*ancho,fila*alto,ancho,alto).scaled(32,32));
+            }
+            if(agente->getvx()>0){
+                mirandoderechaw=true;
+            }
+            else if(agente->getvx()<0){
+                mirandoderechaw=false;
+            }
+            int anchow=hojaWatson.width()/3;
+            int altow=hojaWatson.height();
+            if(agente->getvx()!=0&&agente->getp()==true){
+                contadoranimw++;
+                if(contadoranimw>=6){
+                    contadoranimw=0;
+                    frameactualw=(frameactualw+1)%3;
+                }
+            }
+            else{
+                contadoranimw=0;
+                frameactualw=0;
+            }
+            QPixmap framew=hojaWatson.copy(frameactualw*anchow,0,anchow,altow).scaled(32,32);
+            if(mirandoderechaw==false){
+                framew=framew.transformed(QTransform().scale(-1,1));
+            }
+            spriteWatson->setPixmap(framew);
             spritepuerta->setVisible(n1->getpuerta().getactivo());
             actualizarbotones();
             std::vector<bala*>& balas=n1->getbalas();

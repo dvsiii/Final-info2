@@ -59,11 +59,18 @@ string watson::pistacerca(){
 }
 void watson::actualizar(){
     if(control==false){
-        if(dsherlock[0]-getposicionx()>60){
+        float dx=dsherlock[0]-getposicionx();
+        if(dx>120){
             moverse(true,true);
         }
-        else if(dsherlock[0]-getposicionx()<-60){
+        else if(dx>60){
+            moverse(true,false);
+        }
+        else if(dx<-120){
             moverse(false,true);
+        }
+        else if(dx<-60) {
+            moverse(false,false);
         }
         else{
             setv(0,getvy());

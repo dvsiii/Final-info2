@@ -23,5 +23,6 @@
         <file>assets/puerta.png</file>
         <file>assets/pistas.png</file>
         <file>assets/bala.png</file>
+        <file>assets/watson.png</file>
     </qresource>
 </RCC>
