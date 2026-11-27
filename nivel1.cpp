@@ -281,12 +281,12 @@ puerta& nivel1::getpuerta(){
 void nivel1::agregarbala(bala* b){
     balas.push_back(b);
 }
-void nivel1::resolverColision(personaje& p, plataforma& bloque) {
+void nivel1::resolverColision(personaje& p, plataforma& bloque){
     float penIzq=(p.getposicionx()+p.gethitboxb())-bloque.getposicionx();
     float penDer=(bloque.getposicionx()+bloque.gethitboxb())-p.getposicionx();
     float penArriba=(p.getposiciony()+p.gethitboxa())-bloque.getposiciony();
     float penAbajo=(bloque.getposiciony()+bloque.gethitboxa())-p.getposiciony();
-    if(std::min(penIzq, penDer)<std::min(penArriba, penAbajo)) {
+    if(std::min(penIzq, penDer)<std::min(penArriba, penAbajo)){
         if(penIzq<penDer){
             p.setx(bloque.getposicionx()-p.gethitboxb());
             p.setv(0,p.getvy());
