@@ -12,7 +12,12 @@ MainWindow::MainWindow(QWidget *parent)
     izquierda=false;
     correr=false;
     lanzado=false;
+    arriba=false;
+    abajo=false;
     actual=nullptr;
+    notaAbierta=nullptr;
+    muebles.fill(nullptr);
+    nota.fill(nullptr);
     mirandoderecha=false;
     frameactual=0;
     contadoranim=0;
@@ -193,6 +198,7 @@ void MainWindow::iniciarnivel(short int dif){
     labeltiempo->setText("03:00");
     labelpistas->setVisible(true);
     labeltiempo->setVisible(true);
+    hojaWatson.load(":/assets/watson.png");
     int ancho=hojaSherlock.width()/3;
     int alto=hojaSherlock.height()/2;
     int anchow=hojaWatson.width()/3;
@@ -225,6 +231,38 @@ void MainWindow::iniciarnivel(short int dif){
             sprite->setPos(ganchs[i].getposicionx()-r,ganchs[i].getposiciony()-r);
             ganchos.push_back(sprite);
         }
+    }
+}
+void MainWindow::iniciarnivel2(){
+    delete actual;
+    juego->clear();
+    plataform.clear();
+    bals.clear();
+    ganchos.clear();
+    juego->setSceneRect(0,0,800,600);
+    actual=new nivel2();
+    vista->centerOn(400,300);
+    derecha=false;
+    izquierda=false;
+    arriba=false;
+    abajo=false;
+    correr=false;
+    interactuo=false;
+    labelpistas->setVisible(false);
+    texotint->setVisible(false);
+    QGraphicsPixmapItem *fondo=juego->addPixmap(QPixmap(":/assets/nivel2.png").scaled(800,600));
+    fondo->setPos(0,0);
+    nivel2 *n2=dynamic_cast<nivel2*>(actual);
+    hojaWatson.load(":/assets/watsonn2.png");
+    int ancho=hojaWatson.width();
+    int alto=hojaWatson.height()/2;
+    spriteWatson=juego->addPixmap(hojaWatson.copy(0,0,ancho,alto).scaled(32,32));
+    spriteWatson->setPos(400,300);
+    if(n2!=nullptr){
+        muebles[0]=juego->addPixmap(QPixmap(":/assets/escritorio.png").scaled(50,50));
+        muebles[0]->setPos(230,300);
+        muebles[1]=juego->addPixmap(QPixmap(":/assets/tablero.png").scaled(50,50));
+        muebles[1]->setPos(630,300);
     }
 }
 void MainWindow::keyPressEvent(QKeyEvent *event){
@@ -356,6 +394,50 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
                 }
             }
         }
+        else{
+            nivel2 *n2=dynamic_cast<nivel2*>(actual);
+            if(n2!=nullptr){
+                if(interactuo==false){
+                    if(event->key()==Qt::Key_Left||event->key()==Qt::Key_A){
+                        izquierda=true;
+                    }
+                    else if(event->key()==Qt::Key_Right||event->key()==Qt::Key_D){
+                        derecha=true;
+                    }
+                    else if(event->key()==Qt::Key_Up||event->key()==Qt::Key_W){
+                        arriba=true;
+                    }
+                    else if(event->key()==Qt::Key_Shift){
+                        correr=true;
+                    }
+                    else if(event->key()==Qt::Key_Down||event->key()==Qt::Key_S){
+                        abajo=true;
+                    }
+                    if(n2->cercamueble(n2->getmuebles()[0].getposicionx(),n2->getmuebles()[0].getposiciony())==true){
+                        if(event->key()==Qt::Key_E){
+                            interactuo=true;
+                            izquierda=false;
+                            derecha=false;
+                            correr=false;
+                            arriba=false;
+                            abajo=false;
+                            estado=escritorio;
+                        }
+                    }
+                    else if(n2->cercamueble(n2->getmuebles()[1].getposicionx(),n2->getmuebles()[1].getposiciony())==true){
+                        if(event->key()==Qt::Key_E){
+                            interactuo=true;
+                            izquierda=false;
+                            derecha=false;
+                            correr=false;
+                            arriba=false;
+                            abajo=false;
+                            estado=tablero;
+                        }
+                    }
+                }
+            }
+        }
     }
     else if(estado==Perdiste){
         if(event->key()==Qt::Key_Return||event->key()==Qt::Key_Enter){
@@ -380,6 +462,12 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event){
         }
         else if(event->key()==Qt::Key_Shift){
             correr=false;
+        }
+        else if(event->key()==Qt::Key_Up||event->key()==Qt::Key_W){
+            arriba=false;
+        }
+        else if(event->key()==Qt::Key_Down||event->key()==Qt::Key_S){
+            abajo=false;
         }
     }
 }
@@ -461,6 +549,10 @@ void MainWindow::actualizarjuego(){
                 pistas[i]->setPos(pistasas[i].getposicionx(),pistasas[i].getposiciony());
             }
             labelpistas->setText("Pistas: "+QString::number(recolectadas)+"/6");
+            if(recolectadas==6){
+                iniciarnivel2();
+                return;
+            }
             std::vector<plataforma>& plataformas=n1->getplataformas();
             for(int i=plataformas.size()-1;i>=0;i--){
                 plataform[i]->setVisible(plataformas[i].getactivo());
@@ -573,6 +665,29 @@ void MainWindow::actualizarjuego(){
                 float r=ganchs[i].gethitboxb();
                 ganchos[i]->setVisible(ganchs[i].getactivo());
                 ganchos[i]->setPos(ganchs[i].getposicionx()-r,ganchs[i].getposiciony()-r);
+            }
+        }
+        nivel2 *n2=dynamic_cast<nivel2*>(actual);
+        if(n2!=nullptr){
+            watson* jugador=&n2->getjugador();
+            spriteWatson->setPos(jugador->getposicionx(),jugador->getposiciony());
+            if(derecha==true){
+                jugador->moverse(true,correr);
+            }
+            else if(izquierda==true){
+                jugador->moverse(false,correr);
+            }
+            else{
+                jugador->setv(0,jugador->getvy());
+            }
+            if(arriba==true){
+                jugador->moversevertical(true,correr);
+            }
+            else if(abajo==true){
+                jugador->moversevertical(false,correr);
+            }
+            else{
+                jugador->setv(jugador->getvx(),0);
             }
         }
     }

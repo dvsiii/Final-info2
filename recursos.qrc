@@ -25,5 +25,9 @@
         <file>assets/bala.png</file>
         <file>assets/watson.png</file>
         <file>assets/gameover.png</file>
+        <file>assets/escritorio.png</file>
+        <file>assets/nivel2.png</file>
+        <file>assets/tablero.png</file>
+        <file>assets/watsonn2.png</file>
     </qresource>
 </RCC>

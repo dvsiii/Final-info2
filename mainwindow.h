@@ -8,6 +8,7 @@
 #include <QKeyEvent>
 #include <QPushButton>
 #include "nivel1.h"
+#include "nivel2.h"
 #include <QGraphicsPixmapItem>
 #include <QGraphicsRectItem>
 #include <QLabel>
@@ -35,6 +36,9 @@ private:
     QGraphicsScene *menu;
     QGraphicsScene *juego;
     QGraphicsScene *perdiste;
+    QGraphicsScene *Controlesn1;
+    QGraphicsScene *Controlesn2;
+    QGraphicsScene *Ganaste;
     QLabel *labelpistas;
     QLabel *labeltiempo;
     QTimer *reloj;
@@ -61,16 +65,21 @@ private:
     bool derecha;
     bool izquierda;
     bool correr;
+    bool arriba;
+    bool abajo;
     bool interactuo;
     bool lanzado;
     QLabel *texotint;
     std::array<QGraphicsPixmapItem*,6> pistas;
     std::vector<QGraphicsPixmapItem*> plataform;
+    std::array<QGraphicsPixmapItem*, 2> muebles;
+    std::array<QGraphicsPixmapItem*, 6> nota;
+    QGraphicsPixmapItem *notaAbierta;
     QGraphicsPixmapItem* spritepuerta;
     QGraphicsPixmapItem* spriteboton;
     std::vector<QGraphicsPixmapItem*> ganchos;
     std::vector<QGraphicsPixmapItem*> bals;
-    enum Estado{Inicio,Menu,dificultad,jugando,Perdiste};
+    enum Estado{Inicio,Menu,dificultad,controlesn1,jugando,Perdiste,controlesn2,tablero,escritorio,ganaste};
     Estado estado;
     QGraphicsLineItem *cuerda;
     short int opcion;
@@ -81,6 +90,7 @@ private slots:
     void actualizarbotones();
     void actualizartiempo();
     void iniciarnivel(short int dif);
+    void iniciarnivel2();
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
