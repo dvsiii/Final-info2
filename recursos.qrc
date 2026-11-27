@@ -24,5 +24,6 @@
         <file>assets/pistas.png</file>
         <file>assets/bala.png</file>
         <file>assets/watson.png</file>
+        <file>assets/gameover.png</file>
     </qresource>
 </RCC>

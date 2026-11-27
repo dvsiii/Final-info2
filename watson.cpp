@@ -57,6 +57,24 @@ string watson::pistacerca(){
     string mensaje="la pista mas cerca esta "+direcciony+" a la "+direccionx;
     return mensaje;
 }
+void watson::moversevertical(bool arriba, bool correr){
+    if(arriba==true){
+        if(correr==true){
+            setv(getvx(),-8);
+        }
+        else{
+            setv(getvx(),-4);
+        }
+    }
+    else{
+        if(correr==true){
+            setv(getvx(),8);
+        }
+        else{
+            setv(getvx(),4);
+        }
+    }
+}
 void watson::actualizar(){
     if(control==false){
         float dx=dsherlock[0]-getposicionx();
@@ -81,6 +99,10 @@ void watson::actualizar(){
         else if(dsherlock[1]-getposiciony()<-60){
             sety(dsherlock[1]);
         }
+        personaje::actualizar();
     }
-    personaje::actualizar();
+    else{
+        setx(getposicionx()+getvx());
+        sety(getvy()+getposiciony());
+    }
 }

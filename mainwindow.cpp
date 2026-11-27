@@ -81,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent)
     tiempo->start(16);
     inicio->addPixmap(QPixmap(":/assets/inicio.png").scaled(800,600));
     menu->addPixmap(QPixmap(":/assets/Menu.png").scaled(800,600));
+    perdiste->addPixmap(QPixmap(":/assets/gameover.png").scaled(800,600));
     menu->addWidget(btnjugar);
     menu->addWidget(btnsalir);
     menu->addWidget(btnfacil);
@@ -188,6 +189,10 @@ void MainWindow::iniciarnivel(short int dif){
     actual=new nivel1(dif);
     segundosRestantes=180;
     reloj->start(1000);
+    labelpistas->setText("Pistas: 0/6");
+    labeltiempo->setText("03:00");
+    labelpistas->setVisible(true);
+    labeltiempo->setVisible(true);
     int ancho=hojaSherlock.width()/3;
     int alto=hojaSherlock.height()/2;
     int anchow=hojaWatson.width()/3;
@@ -352,6 +357,17 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
             }
         }
     }
+    else if(estado==Perdiste){
+        if(event->key()==Qt::Key_Return||event->key()==Qt::Key_Enter){
+            estado=Menu;
+            vista->setScene(menu);
+            opcion=0;
+            btnfacil->setVisible(false);
+            btnnormal->setVisible(false);
+            btndificil->setVisible(false);
+            actualizarbotones();
+        }
+    }
 }
 void MainWindow::keyReleaseEvent(QKeyEvent *event){
     if(event->isAutoRepeat()) return;
@@ -432,6 +448,7 @@ void MainWindow::actualizarjuego(){
         if(n1!=nullptr){
             sherlock* jugador=&n1->getjugador();
             watson* agente=&n1->getagente();
+            int recolectadas=0;
             std::array<pista,6>& pistasas=n1->getpistas();
             spriteSherlock->setPos(jugador->getposicionx(),jugador->getposiciony());
             spriteWatson->setPos(agente->getposicionx(),agente->getposiciony());
@@ -439,9 +456,11 @@ void MainWindow::actualizarjuego(){
             for(int i=5;i>=0;i--){
                 if(pistasas[i].getrecolectado()==true){
                     pistas[i]->setVisible(false);
+                    recolectadas++;
                 }
                 pistas[i]->setPos(pistasas[i].getposicionx(),pistasas[i].getposiciony());
             }
+            labelpistas->setText("Pistas: "+QString::number(recolectadas)+"/6");
             std::vector<plataforma>& plataformas=n1->getplataformas();
             for(int i=plataformas.size()-1;i>=0;i--){
                 plataform[i]->setVisible(plataformas[i].getactivo());

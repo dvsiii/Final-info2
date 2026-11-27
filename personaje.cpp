@@ -24,10 +24,10 @@ void personaje::setp(bool p){
 void personaje::moverse(bool derecha, bool correr){
     if(derecha==true){
         if(correr==true){
-            velocidad[0]=10;
+            velocidad[0]=8;
         }
         else{
-            velocidad[0]=5;
+            velocidad[0]=4;
         }
     }
     else{
