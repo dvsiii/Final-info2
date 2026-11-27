@@ -29,5 +29,12 @@
         <file>assets/nivel2.png</file>
         <file>assets/tablero.png</file>
         <file>assets/watsonn2.png</file>
+        <file>assets/nota1.png</file>
+        <file>assets/nota2.png</file>
+        <file>assets/nota3.png</file>
+        <file>assets/nota4.png</file>
+        <file>assets/nota5.png</file>
+        <file>assets/nota6.png</file>
+        <file>assets/ganaste.png</file>
     </qresource>
 </RCC>

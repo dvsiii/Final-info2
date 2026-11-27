@@ -55,10 +55,12 @@ private:
     QPixmap hojaSherlock;
     QPixmap saltosherlock;
     QPixmap hojaWatson;
+    QPixmap verticalwatson;
     bool mirandoderecha;
     int segundosRestantes;
     int frameactual;
     int contadoranim;
+    int dirwatson;
     bool mirandoderechaw;
     int frameactualw;
     int contadoranimw;

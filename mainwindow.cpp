@@ -37,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent)
     menu=new QGraphicsScene(this);
     juego=new QGraphicsScene(this);
     perdiste=new QGraphicsScene(this);
+    Ganaste=new QGraphicsScene(this);
+    Controlesn1=new QGraphicsScene(this);
+    Controlesn2=new QGraphicsScene(this);
     reloj=new QTimer(this);
     btnjugar=new QPushButton;
     btnsalir=new QPushButton;
@@ -87,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent)
     inicio->addPixmap(QPixmap(":/assets/inicio.png").scaled(800,600));
     menu->addPixmap(QPixmap(":/assets/Menu.png").scaled(800,600));
     perdiste->addPixmap(QPixmap(":/assets/gameover.png").scaled(800,600));
+    Ganaste->addPixmap(QPixmap(":/assets/ganaste.png").scaled(800,600));
     menu->addWidget(btnjugar);
     menu->addWidget(btnsalir);
     menu->addWidget(btnfacil);
@@ -198,7 +202,6 @@ void MainWindow::iniciarnivel(short int dif){
     labeltiempo->setText("03:00");
     labelpistas->setVisible(true);
     labeltiempo->setVisible(true);
-    hojaWatson.load(":/assets/watson.png");
     int ancho=hojaSherlock.width()/3;
     int alto=hojaSherlock.height()/2;
     int anchow=hojaWatson.width()/3;
@@ -250,19 +253,32 @@ void MainWindow::iniciarnivel2(){
     interactuo=false;
     labelpistas->setVisible(false);
     texotint->setVisible(false);
+    reloj->stop();
+    labeltiempo->setVisible(false);
     QGraphicsPixmapItem *fondo=juego->addPixmap(QPixmap(":/assets/nivel2.png").scaled(800,600));
     fondo->setPos(0,0);
     nivel2 *n2=dynamic_cast<nivel2*>(actual);
-    hojaWatson.load(":/assets/watsonn2.png");
-    int ancho=hojaWatson.width();
-    int alto=hojaWatson.height()/2;
-    spriteWatson=juego->addPixmap(hojaWatson.copy(0,0,ancho,alto).scaled(32,32));
+    verticalwatson.load(":/assets/watsonn2.png");
+    int ancho=verticalwatson.width()/3;
+    int alto=verticalwatson.height()/2;
+    dirwatson=1;
+    spriteWatson=juego->addPixmap(verticalwatson.copy(0,0,ancho,alto).scaled(32,45));
     spriteWatson->setPos(400,300);
     if(n2!=nullptr){
         muebles[0]=juego->addPixmap(QPixmap(":/assets/escritorio.png").scaled(50,50));
         muebles[0]->setPos(230,300);
         muebles[1]=juego->addPixmap(QPixmap(":/assets/tablero.png").scaled(50,50));
         muebles[1]->setPos(630,300);
+    }
+    notaAbierta=juego->addPixmap(QPixmap());
+    notaAbierta->setPos(250,100);
+    notaAbierta->setZValue(10);
+    notaAbierta->setVisible(false);
+    for(int i=0;i<6;i++){
+        nota[i]=juego->addPixmap(QPixmap());
+        nota[i]->setPos(115+(i%3)*210,90+(i/3)*230);
+        nota[i]->setZValue(10);
+        nota[i]->setVisible(false);
     }
 }
 void MainWindow::keyPressEvent(QKeyEvent *event){
@@ -397,42 +413,49 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
         else{
             nivel2 *n2=dynamic_cast<nivel2*>(actual);
             if(n2!=nullptr){
-                if(interactuo==false){
-                    if(event->key()==Qt::Key_Left||event->key()==Qt::Key_A){
-                        izquierda=true;
+                if(event->key()==Qt::Key_Left||event->key()==Qt::Key_A){
+                    izquierda=true;
+                }
+                else if(event->key()==Qt::Key_Right||event->key()==Qt::Key_D){
+                    derecha=true;
+                }
+                else if(event->key()==Qt::Key_Up||event->key()==Qt::Key_W){
+                    arriba=true;
+                }
+                else if(event->key()==Qt::Key_Shift){
+                    correr=true;
+                }
+                else if(event->key()==Qt::Key_Down||event->key()==Qt::Key_S){
+                    abajo=true;
+                }
+                if(n2->cercamueble(n2->getmuebles()[0].getposicionx(),n2->getmuebles()[0].getposiciony())==true){
+                    if(event->key()==Qt::Key_E){
+                        izquierda=false;
+                        derecha=false;
+                        correr=false;
+                        arriba=false;
+                        abajo=false;
+                        estado=escritorio;
+                        texotint->setText("1-6: Leer nota | Esc: Salir");
+                        texotint->setVisible(true);
+                        notaAbierta->setPixmap(QPixmap(":/assets/nota1.png").scaled(300, 400, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                        notaAbierta->setVisible(true);
                     }
-                    else if(event->key()==Qt::Key_Right||event->key()==Qt::Key_D){
-                        derecha=true;
-                    }
-                    else if(event->key()==Qt::Key_Up||event->key()==Qt::Key_W){
-                        arriba=true;
-                    }
-                    else if(event->key()==Qt::Key_Shift){
-                        correr=true;
-                    }
-                    else if(event->key()==Qt::Key_Down||event->key()==Qt::Key_S){
-                        abajo=true;
-                    }
-                    if(n2->cercamueble(n2->getmuebles()[0].getposicionx(),n2->getmuebles()[0].getposiciony())==true){
-                        if(event->key()==Qt::Key_E){
-                            interactuo=true;
-                            izquierda=false;
-                            derecha=false;
-                            correr=false;
-                            arriba=false;
-                            abajo=false;
-                            estado=escritorio;
-                        }
-                    }
-                    else if(n2->cercamueble(n2->getmuebles()[1].getposicionx(),n2->getmuebles()[1].getposiciony())==true){
-                        if(event->key()==Qt::Key_E){
-                            interactuo=true;
-                            izquierda=false;
-                            derecha=false;
-                            correr=false;
-                            arriba=false;
-                            abajo=false;
-                            estado=tablero;
+                }
+                else if(n2->cercamueble(n2->getmuebles()[1].getposicionx(),n2->getmuebles()[1].getposiciony())==true){
+                    if(event->key()==Qt::Key_E){
+                        izquierda=false;
+                        derecha=false;
+                        correr=false;
+                        arriba=false;
+                        abajo=false;
+                        estado=tablero;
+                        texotint->setText("1-6: Intercambiar | Esc: Salir");
+                        texotint->setVisible(true);
+                        for (int i=0;i<6;i++) {
+                            int id=n2->getnotas()[i].getid();
+                            nota[i]->setPixmap(QPixmap(QString(":/assets/nota%1.png").arg(id)).scaled(150,200,Qt::KeepAspectRatio,Qt::SmoothTransformation));
+                            nota[i]->setVisible(true);
                         }
                     }
                 }
@@ -448,6 +471,54 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
             btnnormal->setVisible(false);
             btndificil->setVisible(false);
             actualizarbotones();
+        }
+    }
+    else if(estado==ganaste){
+        if(event->key()==Qt::Key_Return||event->key()==Qt::Key_Enter){
+            estado=Menu;
+            vista->setScene(menu);
+            opcion=0;
+            btnfacil->setVisible(false);
+            btnnormal->setVisible(false);
+            btndificil->setVisible(false);
+            actualizarbotones();
+        }
+    }
+    else if(estado==escritorio){
+        if(event->key()>=Qt::Key_1&& event->key()<=Qt::Key_6){
+            int num=event->key()-Qt::Key_0;
+            notaAbierta->setPixmap(QPixmap(QString(":/assets/nota%1.png").arg(num)).scaled(300, 400));
+            notaAbierta->setVisible(true);
+        }
+        else if (event->key()==Qt::Key_Escape){
+            notaAbierta->setVisible(false);
+            texotint->setVisible(false);
+            estado=jugando;
+        }
+    }
+    else if(estado==tablero){
+        nivel2 *n2=dynamic_cast<nivel2*>(actual);
+        if(n2!=nullptr){
+            if(event->key()>=Qt::Key_1&&event->key()<=Qt::Key_6){
+                int idx=event->key()-Qt::Key_1;
+                n2->seleccionar(idx);
+                for(int i=0;i<6;i++){
+                    int id=n2->getnotas()[i].getid();
+                    nota[i]->setPixmap(QPixmap(QString(":/assets/nota%1.png").arg(id)).scaled(150,200,Qt::KeepAspectRatio,Qt::SmoothTransformation));
+                }
+                if (n2->getcompletado()==true){
+                    texotint->setVisible(false);
+                    estado=ganaste;
+                    vista->setScene(Ganaste);
+                }
+            }
+            else if(event->key()==Qt::Key_Escape){
+                for(int i=0;i<6;i++){
+                    nota[i]->setVisible(false);
+                }
+                texotint->setVisible(false);
+                estado=jugando;
+            }
         }
     }
 }
@@ -688,6 +759,44 @@ void MainWindow::actualizarjuego(){
             }
             else{
                 jugador->setv(jugador->getvx(),0);
+            }
+            if(arriba==true){
+                dirwatson=0;
+            }
+            else if(abajo==true){
+                dirwatson=1;
+            }
+            else if(derecha==true){
+                dirwatson=2;
+            }
+            else if(izquierda==true){
+                dirwatson=3;
+            }
+
+            if(arriba || abajo || derecha || izquierda){
+                contadoranimw++;
+                if (contadoranimw>=6){
+                    contadoranimw=0;
+                    frameactualw=(frameactualw+1)%3;
+                }
+            }
+            else{
+                contadoranimw=0;
+                frameactualw=0;
+            }
+            if(dirwatson==0||dirwatson==1){
+                int anchov=verticalwatson.width()/3;
+                int altov=verticalwatson.height()/2;
+                spriteWatson->setPixmap(verticalwatson.copy(frameactualw*anchov,dirwatson*altov,anchov,altov).scaled(32,45));
+            }
+            else{
+                int anchow=hojaWatson.width()/3;
+                int altow=hojaWatson.height();
+                QPixmap framew=hojaWatson.copy(frameactualw*anchow,0,anchow,altow).scaled(32,45);
+                if(dirwatson == 3){
+                    framew=framew.transformed(QTransform().scale(-1,1));
+                }
+                spriteWatson->setPixmap(framew);
             }
         }
     }

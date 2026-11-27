@@ -17,10 +17,10 @@ nivel2::nivel2() {
     muebles[1].setb(50);
     muebles[1].seta(50);
     nota[0].setid(6);
-    nota[1].setid(5);
-    nota[2].setid(4);
-    nota[3].setid(3);
-    nota[4].setid(2);
+    nota[1].setid(4);
+    nota[2].setid(5);
+    nota[3].setid(2);
+    nota[4].setid(3);
     nota[5].setid(1);
     pared[0].setx(0);
     pared[0].sety(0);
@@ -72,6 +72,14 @@ void nivel2::seleccionar(int in){
         nota[selecionado].setid(p);
         selecionado=-1;
     }
+    bool completado;
+    if(nota[0].getid()==1&&nota[1].getid()==2&&nota[2].getid()==3&&nota[5].getid()==6&&nota[3].getid()==4&&nota[4].getid()==5){
+        completado=true;
+    }
+    else{
+        completado=false;
+    }
+    setcompletado(completado);
 }
 void nivel2::resolverColision(personaje& p, plataforma& bloque){
     float penIzq=(p.getposicionx()+p.gethitboxb())-bloque.getposicionx();
@@ -101,7 +109,6 @@ void nivel2::resolverColision(personaje& p, plataforma& bloque){
 }
 void nivel2::actualizar(){
     jugador.actualizar();
-    bool completado;
     for(int i=1;i>=0;i--){
         if(jugador.colision(&muebles[i])==true){
             resolverColision(jugador,muebles[i]);
@@ -112,11 +119,4 @@ void nivel2::actualizar(){
             resolverColision(jugador,pared[i]);
         }
     }
-    if(nota[0].getid()==4&&nota[1].getid()==3&&nota[2].getid()==2&&nota[5].getid()==1&&nota[3].getid()==6&&nota[4].getid()==5){
-        completado=true;
-    }
-    else{
-        completado=false;
-    }
-    setcompletado(completado);
 }
