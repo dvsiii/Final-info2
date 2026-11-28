@@ -13,6 +13,8 @@ class nivel2: public nivel
     short int selecionado;
     std::array<plataforma,2> muebles;
     std::array<plataforma,4> pared;
+    float friccion;
+    float restitucion;
 public:
     nivel2();
     watson& getjugador();
@@ -20,6 +22,7 @@ public:
     bool cercamueble(float xm, float ym);
     std::array<plataforma, 2>& getmuebles();
     short int getselecionado();
+    void aplicarFriccion(bool enX, bool enY);
     void seleccionar(int in);
     void resolverColision(personaje& p, plataforma& bloque);
     void actualizar() override;

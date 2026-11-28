@@ -829,7 +829,7 @@ void MainWindow::actualizarjuego(){
                 jugador->moverse(false,correr);
             }
             else{
-                jugador->setv(0,jugador->getvy());
+                n2->aplicarFriccion(true,false);
             }
             if(arriba==true){
                 jugador->moversevertical(true,correr);
@@ -838,7 +838,7 @@ void MainWindow::actualizarjuego(){
                 jugador->moversevertical(false,correr);
             }
             else{
-                jugador->setv(jugador->getvx(),0);
+                n2->aplicarFriccion(false,true);
             }
             if(arriba==true){
                 dirwatson=0;

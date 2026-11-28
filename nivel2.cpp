@@ -38,6 +38,8 @@ nivel2::nivel2() {
     pared[3].sety(0);
     pared[3].setb(41);
     pared[3].seta(600);
+    friccion=0.85f;
+    restitucion=0.6f;
 }
 watson& nivel2::getjugador(){
     return jugador;
@@ -84,6 +86,19 @@ void nivel2::seleccionar(int in){
     }
     setcompletado(completado);
 }
+void nivel2::aplicarFriccion(bool enX, bool enY) {
+    float vx=jugador.getvx();
+    float vy=jugador.getvy();
+    if(enX){
+        vx*=friccion;
+        if(qAbs(vx)<0.1f)vx=0;
+    }
+    if(enY){
+        vy*=friccion;
+        if(qAbs(vy)<0.1f)vy=0;
+    }
+    jugador.setv(vx, vy);
+}
 void nivel2::resolverColision(personaje& p, plataforma& bloque){
     float penIzq=(p.getposicionx()+p.gethitboxb())-bloque.getposicionx();
     float penDer=(bloque.getposicionx()+bloque.gethitboxb())-p.getposicionx();
@@ -92,21 +107,21 @@ void nivel2::resolverColision(personaje& p, plataforma& bloque){
     if(std::min(penIzq, penDer)<std::min(penArriba, penAbajo)){
         if(penIzq<penDer){
             p.setx(bloque.getposicionx()-p.gethitboxb());
-            p.setv(0,p.getvy());
+            p.setv(-p.getvx()*restitucion,p.getvy());
         }
         else{
             p.setx(bloque.getposicionx()+bloque.gethitboxb());
-            p.setv(0,p.getvy());
+            p.setv(-p.getvx()*restitucion,p.getvy());
         }
     }
     else{
         if (penArriba<penAbajo){
             p.sety(bloque.getposiciony()-p.gethitboxa());
-            p.setv(p.getvx(),0);
+            p.setv(p.getvx(),-p.getvy()*restitucion);
         }
         else {
             p.sety(bloque.getposiciony()+bloque.gethitboxa());
-            p.setv(p.getvx(),0);
+            p.setv(p.getvx(),-p.getvy()*restitucion);
         }
     }
 }
