@@ -2,7 +2,10 @@
 #include <QtMath>
 #include <algorithm>
 using namespace std;
-nivel1::nivel1(short int dif) {
+nivel1::nivel1(short int dif){
+    if (dif<0||dif>2){
+        throw invalid_argument("Dificultad invalida: debe ser 0, 1 o 2.");
+    }
     setdificultad(dif);
     objetivo=0;
     jugador.setb(32);
@@ -315,7 +318,22 @@ void nivel1::actualizar(){
         setcompletado(true);
         return;
     }
-    agente.setdsh(jugador.getposicionx(),jugador.getposiciony());
+    pista* cercana=nullptr;
+    float distmin=99999;
+    for(int i = pistas.size()-1;i>=0;i--){
+        pistas[i].actualizar();
+        if(jugador.colision(&pistas[i]) == true && pistas[i].getrecolectado()==false){
+            pistas[i].setrecolectado(true);
+            objetivo++;
+            jugador.activarEuforia();
+        }
+        float dist=qSqrt(qPow(pistas[i].getposicionx()-agente.getposicionx(),2)+qPow(pistas[i].getposiciony()-agente.getposiciony(),2));
+        if (distmin>dist&&pistas[i].getrecolectado()==false){
+            distmin=dist;
+            cercana=&pistas[i];
+        }
+    }
+    agente.percibir(jugador.getposicionx(), jugador.getposiciony(),cercana);
     agente.actualizar();
     jugador.actualizar();
     puert.actualizar();
@@ -353,20 +371,6 @@ void nivel1::actualizar(){
             ganchoActual=-1;
         }
     }
-    pista* cercana =nullptr;
-    float distmin=99999;
-    for(int i=pistas.size()-1;i>=0;i--){
-        pistas[i].actualizar();
-        if(jugador.colision(&pistas[i])==true&&pistas[i].getrecolectado()==false){
-            pistas[i].setrecolectado(true);
-            objetivo++;
-        }
-        if(distmin>qSqrt(qPow((pistas[i].getposicionx()-agente.getposicionx()),2)+qPow((pistas[i].getposiciony()-agente.getposiciony()),2))&&pistas[i].getrecolectado()==false){
-            distmin=qSqrt(qPow((pistas[i].getposicionx()-agente.getposicionx()),2)+qPow((pistas[i].getposiciony()-agente.getposiciony()),2));
-            cercana=&pistas[i];
-        }
-    }
-    agente.setpista(cercana);
     for(int i=balas.size()-1;i>=0;i--){
         if(balas[i]->getacti()==true){
             balas[i]->actualizar();

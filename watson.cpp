@@ -6,6 +6,9 @@ watson::watson() {
     dsherlock[0]=0;
     dsherlock[1]=0;
     pistas=nullptr;
+    ultimaPista=nullptr;
+    consultasMismaPista=0;
+    decisionMov=0;
 }
 bool watson::getcontrol(){
     return control;
@@ -36,25 +39,19 @@ bala* watson::disparar(float x, float y){
     return eso;
 }
 string watson::pistacerca(){
-    string direccionx="";
-    string direcciony="";
-    if(pistas==nullptr){
-        string mensaje="no hay pista disponible";
-        return mensaje;
+    if (pistas==nullptr) {
+        return"no hay pista disponible";
     }
-    if(pistas->getposicionx()>getposicionx()){
-        direccionx+="derecha";
+    aprender();
+    string direccionx=(pistas->getposicionx()>getposicionx())?"derecha":"izquierda";
+    string direcciony=(pistas->getposiciony()<getposiciony())?"arriba":"abajo";
+    string mensaje="Pista "+direcciony+" a la "+direccionx;
+    if (consultasMismaPista==2){
+        int dist=qSqrt(qPow(pistas->getposicionx()-getposicionx(),2)+qPow(pistas->getposiciony()-getposiciony(),2));
+        mensaje+=" (~"+to_string(dist)+" px)";
+    } else if(consultasMismaPista>=3){
+        mensaje+=" en ("+to_string((int)pistas->getposicionx())+", "+to_string((int)pistas->getposiciony())+")";
     }
-    else if(pistas->getposicionx()<getposicionx()){
-        direccionx+="izquierda";
-    }
-    if(pistas->getposiciony()<getposiciony()){
-        direcciony+="arriba";
-    }
-    else if(pistas->getposiciony()>getposiciony()){
-        direcciony+="abajo";
-    }
-    string mensaje="la pista mas cerca esta "+direcciony+" a la "+direccionx;
     return mensaje;
 }
 void watson::moversevertical(bool arriba, bool correr){
@@ -75,31 +72,47 @@ void watson::moversevertical(bool arriba, bool correr){
         }
     }
 }
+void watson::percibir(float sx, float sy, pista* p){
+    dsherlock[0]=sx;
+    dsherlock[1]=sy;
+    pistas=p;
+}
+void watson::aprender(){
+    if (pistas==nullptr){
+        return;
+    }
+    if(pistas==ultimaPista){
+        consultasMismaPista++;
+    }
+    else{
+        ultimaPista=pistas;
+        consultasMismaPista=1;
+    }
+}
+void watson::razonar(){
+    float dx=dsherlock[0]-getposicionx();
+    if(dx>120)decisionMov=2;
+    else if(dx>60)decisionMov=1;
+    else if(dx<-120)decisionMov=-2;
+    else if(dx<-60)decisionMov=-1;
+    else decisionMov=0;
+}
+
+void watson::actuar(){
+    if(decisionMov==2)moverse(true, true);
+    else if(decisionMov==1)moverse(true, false);
+    else if(decisionMov==-2)moverse(false, true);
+    else if(decisionMov==-1)moverse(false, false);
+    else setv(0,getvy());
+    if (dsherlock[1]-getposiciony()>60||dsherlock[1]-getposiciony()<-60){
+        sety(dsherlock[1]);
+    }
+    personaje::actualizar();
+}
 void watson::actualizar(){
     if(control==false){
-        float dx=dsherlock[0]-getposicionx();
-        if(dx>120){
-            moverse(true,true);
-        }
-        else if(dx>60){
-            moverse(true,false);
-        }
-        else if(dx<-120){
-            moverse(false,true);
-        }
-        else if(dx<-60) {
-            moverse(false,false);
-        }
-        else{
-            setv(0,getvy());
-        }
-        if(dsherlock[1]-getposiciony()>60){
-            sety(dsherlock[1]);
-        }
-        else if(dsherlock[1]-getposiciony()<-60){
-            sety(dsherlock[1]);
-        }
-        personaje::actualizar();
+        razonar();
+        actuar();
     }
     else{
         setx(getposicionx()+getvx());

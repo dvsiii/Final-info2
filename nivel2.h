@@ -5,6 +5,7 @@
 #include "watson.h"
 #include <array>
 #include "plataforma.h"
+#include <stdexcept>
 class nivel2: public nivel
 {
     watson jugador;

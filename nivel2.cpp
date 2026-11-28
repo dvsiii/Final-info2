@@ -63,6 +63,9 @@ bool nivel2::cercamueble(float xm,float ym){
     }
 }
 void nivel2::seleccionar(int in){
+    if(in<0||in>=6){
+        throw std::out_of_range("Indice de nota fuera de rango.");
+    }
     if(selecionado==-1){
         selecionado=in;
     }

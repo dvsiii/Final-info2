@@ -10,6 +10,7 @@
 #include "bala.h"
 #include <vector>
 #include <array>
+#include <stdexcept>
 class nivel1: public nivel
 {
     std::vector<plataforma> plataformas;

@@ -1,12 +1,15 @@
 #include "sherlock.h"
 #include <QtMath>
-sherlock::sherlock() {
+sherlock::sherlock(){
     gancho=false;
     pivote[0]=0;
     pivote[1]=0;
     angulo=0;
     fangular=0;
     espera=0;
+    tiempoEuforico=0;
+    tiempoCorriendo=0;
+    tiempoImpulsivo=0;
 }
 bool sherlock::getgancho(){
     return gancho;
@@ -25,6 +28,36 @@ float sherlock::getangulo(){
 }
 float sherlock::getespera(){
     return espera;
+}
+void sherlock::activarEuforia() {tiempoEuforico = 8.0f;}
+bool sherlock::estaEuforico() {return tiempoEuforico > 0;}
+bool sherlock::estaImpulsivo() {return tiempoImpulsivo > 0;}
+void sherlock::moverse(bool derecha, bool correr){
+    if(correr && getp()){
+        tiempoCorriendo+=0.016f;
+        if (tiempoCorriendo>=3.0f){
+            tiempoImpulsivo=4.0f;
+            tiempoCorriendo=0;
+        }
+    }
+    else{
+        tiempoCorriendo=0;
+    }
+    float vel=correr?8.0f:4.0f;
+    if (tiempoEuforico>0)vel*=0.7f;
+    if (tiempoImpulsivo>0)vel+=2.5f;
+    setv(derecha?vel:-vel,getvy());
+}
+void sherlock::saltar(){
+    if(getp()==true){
+        setv(getvx(),(tiempoEuforico > 0)?-14.5f:-12.5f);
+        setp(false);
+    }
+}
+void sherlock::frenar(){
+    tiempoCorriendo=0;
+    if (tiempoImpulsivo>0)setv(getvx()*0.90f,getvy());
+    else setv(0,getvy());
 }
 void sherlock::setfa(float fa){
     fangular=fa;
@@ -52,6 +85,8 @@ void sherlock::soltarse(){
     setv(qCos(angulo)*fangular*0.016f*50.0f,(-qSin(angulo)*fangular*0.016f*50.0f)-12.5);
 }
 void sherlock::actualizar(){
+    if (tiempoEuforico>0)tiempoEuforico-=0.016f;
+    if (tiempoImpulsivo>0)tiempoImpulsivo-=0.016f;
     if(gancho==false){
         if(espera>=0){
             espera-=0.016f;

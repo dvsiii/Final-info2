@@ -15,6 +15,11 @@
 #include <QMouseEvent>
 #include <QGraphicsLineItem>
 #include <QGraphicsEllipseItem>
+#include <QMediaPlayer>
+#include <QAudioOutput>
+#include <QUrl>
+#include <stdexcept>
+#include <QMessageBox>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -56,6 +61,12 @@ private:
     QPixmap saltosherlock;
     QPixmap hojaWatson;
     QPixmap verticalwatson;
+    QMediaPlayer *musica;
+    QAudioOutput *salidaMusica;
+    QMediaPlayer *sonidoSalto;
+    QAudioOutput *salidaSalto;
+    QMediaPlayer *sonidoPista;
+    QAudioOutput *salidaPista;
     bool mirandoderecha;
     int segundosRestantes;
     int frameactual;

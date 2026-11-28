@@ -77,6 +77,8 @@ MainWindow::MainWindow(QWidget *parent)
     inicio->setSceneRect(0,0,800,600);
     menu->setSceneRect(0,0,800,600);
     perdiste->setSceneRect(0,0,800,600);
+    Controlesn2->setSceneRect(0,0,800,600);
+    Controlesn1->setSceneRect(0,0,800,600);
     vista=new QGraphicsView(inicio,this);
     vista->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     vista->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -91,6 +93,8 @@ MainWindow::MainWindow(QWidget *parent)
     menu->addPixmap(QPixmap(":/assets/Menu.png").scaled(800,600));
     perdiste->addPixmap(QPixmap(":/assets/gameover.png").scaled(800,600));
     Ganaste->addPixmap(QPixmap(":/assets/ganaste.png").scaled(800,600));
+    Controlesn1->addPixmap(QPixmap(":/assets/controlesn1.png").scaled(800,600));
+    Controlesn2->addPixmap(QPixmap(":/assets/controlesn2.png").scaled(800,600));
     menu->addWidget(btnjugar);
     menu->addWidget(btnsalir);
     menu->addWidget(btnfacil);
@@ -98,13 +102,19 @@ MainWindow::MainWindow(QWidget *parent)
     menu->addWidget(btndificil);
     connect(btnsalir,&QPushButton::clicked,this,&MainWindow::close);
     connect(btnfacil,&QPushButton::clicked,this,[this](){
-        iniciarnivel(0);
+        opcion=0;
+        estado=controlesn1;
+        vista->setScene(Controlesn1);
     });
     connect(btnnormal,&QPushButton::clicked,this,[this](){
-        iniciarnivel(1);
+        opcion=1;
+        estado=controlesn1;
+        vista->setScene(Controlesn1);
     });
     connect(btndificil, &QPushButton::clicked, this,[this](){
-        iniciarnivel(2);
+        opcion=2;
+        estado=controlesn1;
+        vista->setScene(Controlesn1);
     });
     connect(btnjugar,&QPushButton::clicked,this,[this](){
         estado=dificultad;
@@ -114,7 +124,7 @@ MainWindow::MainWindow(QWidget *parent)
         btndificil->setVisible(true);
         actualizarbotones();
     });
-    connect(reloj, &QTimer::timeout, this, &MainWindow::actualizartiempo);
+    connect(reloj, &QTimer::timeout,this,&MainWindow::actualizartiempo);
     interactuo=false;
     texotint=new QLabel(this);
     texotint->setGeometry(180,20,440,40);
@@ -131,9 +141,30 @@ MainWindow::MainWindow(QWidget *parent)
     labeltiempo->setAlignment(Qt::AlignCenter);
     labeltiempo->setStyleSheet("background-color: rgba(0, 0, 0, 180); color: white; font-size: 14px;");
     labeltiempo->setVisible(false);
-    hojaSherlock.load(":/assets/Sherlock_walking.png");
-    saltosherlock.load(":/assets/Sherlock_salta.png");
-    hojaWatson.load(":/assets/watson.png");
+    musica=new QMediaPlayer(this);
+    salidaMusica=new QAudioOutput(this);
+    musica->setAudioOutput(salidaMusica);
+    salidaMusica->setVolume(0.5);
+    musica->setLoops(QMediaPlayer::Infinite);
+    musica->setSource(QUrl("qrc:/audios/Mark Hutson - retry.mp3"));
+    musica->play();
+    sonidoSalto=new QMediaPlayer(this);
+    salidaSalto=new QAudioOutput(this);
+    sonidoSalto->setAudioOutput(salidaSalto);
+    salidaSalto->setVolume(0.8);
+    sonidoSalto->setSource(QUrl("qrc:/audios/salto.mp3"));
+    sonidoPista=new QMediaPlayer(this);
+    salidaPista=new QAudioOutput(this);
+    sonidoPista->setAudioOutput(salidaPista);
+    salidaPista->setVolume(0.8);
+    sonidoPista->setSource(QUrl("qrc:/audios/recoger.mp3"));
+    try{
+        if(!hojaSherlock.load(":/assets/Sherlock_walking.png")||!saltosherlock.load(":/assets/Sherlock_salta.png") ||!hojaWatson.load(":/assets/watson.png")){
+            throw std::runtime_error("No se pudieron cargar las hojas de sprites.");
+        }
+    }catch (const std::runtime_error &e) {
+        QMessageBox::critical(this, "Error de recursos", e.what());
+    }
     vista->scale(1.8,1.8);
 }
 void MainWindow::actualizarbotones(){
@@ -178,10 +209,21 @@ void MainWindow::actualizarbotones(){
 }
 void MainWindow::iniciarnivel(short int dif){
     delete actual;
+    actual=nullptr;
+    try{
+        actual=new nivel1(dif);
+    }catch (const std::invalid_argument &e) {
+        QMessageBox::warning(this, "Error de dificultad", e.what());
+        estado=Menu;
+        vista->setScene(menu);
+        return;
+    }
     juego->clear();
     plataform.clear();
     bals.clear();
     ganchos.clear();
+    musica->setSource(QUrl("qrc:/audios/Justin Allan Arnold - Premonition In The Park.mp3"));
+    musica->play();
     QGraphicsPixmapItem *fondo=juego->addPixmap(QPixmap(":/assets/bocetomapa.png").scaled(2400,1800));
     for(int i=0;i<15;i++){
         mira[i]=juego->addEllipse(0,0,4,4,QPen(Qt::NoPen),QBrush(Qt::white));
@@ -195,7 +237,6 @@ void MainWindow::iniciarnivel(short int dif){
     estado=jugando;
     vista->setScene(juego);
     vista->centerOn(1200,1718);
-    actual=new nivel1(dif);
     segundosRestantes=180;
     reloj->start(1000);
     labelpistas->setText("Pistas: 0/6");
@@ -242,6 +283,8 @@ void MainWindow::iniciarnivel2(){
     plataform.clear();
     bals.clear();
     ganchos.clear();
+    musica->setSource(QUrl("qrc:/audios/Justin Allan Arnold - Premonition In The Park.mp3"));
+    musica->play();
     juego->setSceneRect(0,0,800,600);
     actual=new nivel2();
     vista->centerOn(400,300);
@@ -360,7 +403,22 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
             }
         }
         else if(event->key()==Qt::Key_Enter||event->key()==Qt::Key_Return){
+            estado=controlesn1;
+            vista->setScene(Controlesn1);
+        }
+    }
+    else if(estado==controlesn1){
+        if(event->key()==Qt::Key_Return||event->key()==Qt::Key_Enter){
+            estado=jugando;
+            vista->setScene(juego);
             iniciarnivel(opcion);
+        }
+    }
+    else if(estado==controlesn2){
+        if(event->key()==Qt::Key_Return||event->key()==Qt::Key_Enter){
+            estado=jugando;
+            vista->setScene(juego);
+            iniciarnivel2();
         }
     }
     else if(estado==jugando){
@@ -377,6 +435,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
                 }
                 else if(event->key()==Qt::Key_Up||event->key()==Qt::Key_W){
                     if(jugador.getgancho()==false){
+                        if(jugador.getp()==true){
+                            sonidoSalto->setPosition(0);
+                            sonidoSalto->play();
+                        }
                         jugador.saltar();
                         lanzado=false;
                     }
@@ -466,6 +528,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
         if(event->key()==Qt::Key_Return||event->key()==Qt::Key_Enter){
             estado=Menu;
             vista->setScene(menu);
+            musica->setSource(QUrl("qrc:/audios/Mark Hutson - retry.mp3"));
+            musica->play();
             opcion=0;
             btnfacil->setVisible(false);
             btnnormal->setVisible(false);
@@ -477,6 +541,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
         if(event->key()==Qt::Key_Return||event->key()==Qt::Key_Enter){
             estado=Menu;
             vista->setScene(menu);
+            musica->setSource(QUrl("qrc:/audios/Mark Hutson - retry.mp3"));
+            musica->play();
             opcion=0;
             btnfacil->setVisible(false);
             btnnormal->setVisible(false);
@@ -501,7 +567,12 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
         if(n2!=nullptr){
             if(event->key()>=Qt::Key_1&&event->key()<=Qt::Key_6){
                 int idx=event->key()-Qt::Key_1;
-                n2->seleccionar(idx);
+                try{
+                    n2->seleccionar(idx);
+                } catch (const std::out_of_range &e){
+                    QMessageBox::warning(this, "Error en tablero", e.what());
+                    return;
+                }
                 for(int i=0;i<6;i++){
                     int id=n2->getnotas()[i].getid();
                     nota[i]->setPixmap(QPixmap(QString(":/assets/nota%1.png").arg(id)).scaled(150,200,Qt::KeepAspectRatio,Qt::SmoothTransformation));
@@ -614,6 +685,10 @@ void MainWindow::actualizarjuego(){
             vista->centerOn(jugador->getposicionx(),jugador->getposiciony());
             for(int i=5;i>=0;i--){
                 if(pistasas[i].getrecolectado()==true){
+                    if(pistas[i]->isVisible()){
+                        sonidoPista->setPosition(0);
+                        sonidoPista->play();
+                    }
                     pistas[i]->setVisible(false);
                     recolectadas++;
                 }
@@ -621,7 +696,12 @@ void MainWindow::actualizarjuego(){
             }
             labelpistas->setText("Pistas: "+QString::number(recolectadas)+"/6");
             if(recolectadas==6){
-                iniciarnivel2();
+                estado=controlesn2;
+                vista->setScene(Controlesn2);
+                reloj->stop();
+                labelpistas->setVisible(false);
+                labeltiempo->setVisible(false);
+                texotint->setVisible(false);
                 return;
             }
             std::vector<plataforma>& plataformas=n1->getplataformas();
@@ -654,7 +734,7 @@ void MainWindow::actualizarjuego(){
             }
             else if(jugador->getp()==true){
                 lanzado=false;
-                jugador->setv(0,jugador->getvy());
+                jugador->frenar();
             }
             else if(lanzado==false){
                 jugador->setv(0,jugador->getvy());

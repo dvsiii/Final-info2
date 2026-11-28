@@ -8,6 +8,9 @@ class sherlock: public personaje
     float fangular;
     float angulo;
     float espera;
+    float tiempoEuforico;
+    float tiempoCorriendo;
+    float tiempoImpulsivo;
 public:
     sherlock();
     bool getgancho();
@@ -21,6 +24,12 @@ public:
     void setpivote(float x, float y);
     void setgancho(bool estado);
     void agarre(float px, float py);
+    void activarEuforia();
+    bool estaEuforico();
+    bool estaImpulsivo();
+    void moverse(bool derecha, bool correr);
+    void saltar();
+    void frenar();
     void soltarse();
     void actualizar() override;
 };

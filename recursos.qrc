@@ -36,5 +36,11 @@
         <file>assets/nota5.png</file>
         <file>assets/nota6.png</file>
         <file>assets/ganaste.png</file>
+        <file>audios/Justin Allan Arnold - Premonition In The Park.mp3</file>
+        <file>audios/Mark Hutson - retry.mp3</file>
+        <file>audios/recoger.mp3</file>
+        <file>audios/salto.mp3</file>
+        <file>assets/controlesn1.png</file>
+        <file>assets/controlesn2.png</file>
     </qresource>
 </RCC>
